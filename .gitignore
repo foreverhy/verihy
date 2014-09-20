@@ -1,0 +1,6 @@
+*.o
+*.pyc
+main
+*.in
+*.out
+*.o2
