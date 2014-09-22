@@ -45,7 +45,7 @@
 
 #include <limits.h>
 #include "gtest/gtest.h"
-#include "../data_structure.cpp"
+#include "../data_structure.hpp"
 
 
 // Step 2. Use the TEST macro to define your tests.

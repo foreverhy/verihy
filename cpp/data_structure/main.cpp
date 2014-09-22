@@ -1,4 +1,4 @@
-#include"data_structure.cpp"
+#include"data_structure.hpp"
 #include<iostream>
 
 using std::cin;

@@ -1,0 +1,8 @@
+#ifndef DATA_STRUCTURE_H
+#define DATA_STRUCTURE_H 1
+
+#include "data_structure/priority_queue.hpp"
+#include "data_structure/binary_search_tree.hpp"
+
+
+#endif // DATA_STRUCTURE_H

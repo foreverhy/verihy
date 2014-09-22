@@ -78,13 +78,11 @@ gtest_main.a : gtest-all.o gtest_main.o
 # function.
 
 
-data_structure.o: $(USER_DIR)/data_structure.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/data_structure.cpp -o data_structure.o
 
 data_structure_unittest.o : $(TEST_DIR)/data_structure_unittest.cpp \
-							$(USER_DIR)/data_structure.cpp $(GTEST_HEADERS)
+							$(USER_DIR)/data_structure.hpp $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(TEST_DIR)/data_structure_unittest.cpp 
 
-data_structure_unittest : data_structure.o data_structure_unittest.o gtest_main.a
+data_structure_unittest :  data_structure_unittest.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
