@@ -5,6 +5,6 @@ main
 *.out
 *.o2
 *.gch
-*unittest*
+*unittest
 *.a
 *.la
