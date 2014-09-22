@@ -4,3 +4,7 @@ main
 *.in
 *.out
 *.o2
+*.gch
+*unittest*
+*.a
+*.la

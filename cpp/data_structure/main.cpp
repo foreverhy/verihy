@@ -1,4 +1,4 @@
-#include"data_structure.hpp"
+#include"data_structure.cpp"
 #include<iostream>
 
 using std::cin;
@@ -21,23 +21,27 @@ int main(int argc, char *argv[])
     binary_search_tree<char,int> a;
 
     a.put('a', 100);
+    a.debug();
     a.put('b', 101);
+    a.debug();
     a.put('c', 102);
+    a.debug();
     a.put('d', 104);
+    a.debug();
+    a.remove('c');
+    a.debug();
+    a.put('c', 333);
+    a.debug();
+    a.remove('d');
+    a.debug();
    // int *b=NULL;
    // b = a.get(1);
-   cout<<"SIZE: "<< a.size() <<endl;
-   a.put('a', 444);
-   cout<<"SIZE: "<< a.size() <<endl;
-   //a.remove('c');
-   cout<<"SIZE: "<< a.size() <<endl;
 
-    a.debug();
     //std::cout<<(*(a.get(1)))<<std::endl;
    // a.put(1, 201);
 
     try{
-        std::cout<<"MIN: "<<a.min()<<std::endl;
+        std::cout<<"MIN: "<<a.min_key()<<std::endl;
         std::cout<<(a.get('a'))<<std::endl;
         std::cout<<(a.get('b'))<<std::endl;
      //   std::cout<<*(a.get(3))<<std::endl;

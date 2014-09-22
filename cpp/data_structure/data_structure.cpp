@@ -89,14 +89,14 @@ class node{
   public:
     Tkey key;
     Tval val;
-    node *left, *right;
+    node *left, *right, *parent;
     unsigned size;
 
     node(Tkey key, Tval val){
         this->key = key;
         this->val = val;
-        left = right = NULL;
-        size = 0;
+        left = right = parent= NULL;
+        size = 1;
     }
 
     ~node(){
@@ -125,38 +125,51 @@ class binary_search_tree {
         delete h;
     }
 
-
-    Tval get(Tkey key, node<Tkey, Tval> *h) {
+    node<Tkey, Tval>* get_node(Tkey key, node<Tkey, Tval> *h){
         if(NULL == h){
-            throw KeyNotFoundError();
+            return NULL;
         }
         if(key == h->key){
-            return h->val;
+            return h;
+        }else if(key <= h->key){
+            return get_node(key, h->left);
+        }else{
+            return get_node(key, h->right);
         }
-        if(key < h->key){
-            return get(key, h->left);
+    }
+
+    Tval get(Tkey key, node<Tkey, Tval> *h) {
+        node<Tkey, Tval>* tmpnode = get_node(key, h);
+        if(NULL == tmpnode){
+            throw KeyNotFoundError();
         }
-        if(key > h->key){
-            return get(key, h->right);
-        }
-        throw KeyNotFoundError();
+        return tmpnode->val;
     }
 
 
-    void put(Tkey key, Tval val, node<Tkey, Tval>* &h) {
+    // return value
+    // 0 -- node changed
+    // 1 -- node added
+    int put(Tkey key, Tval val, node<Tkey, Tval>* &h, node<Tkey, Tval> *parent) {
         if(NULL == h){
             h =  new node<Tkey,Tval>(key,val);
-            return;
+            h->parent = parent;
+            return 1;
         }
+
+        int flag = 0;
 
         if(key == h->key){
             h->val = val;
         }else if(key < h->key){
-            put(key, val, h->left);
+            flag = put(key, val, h->left, h);
         }else {
-            put(key, val, h->right);
+            flag = put(key, val, h->right, h);
         }
-        h->size += 1;
+        if(flag){
+            h->size += 1;
+        }
+        return flag;
     }
 
     node<Tkey, Tval>* max(node<Tkey, Tval> *h){
@@ -181,7 +194,92 @@ class binary_search_tree {
         return min(h->left);
 
     }
+
+    // return value
+    //  the deleted node
+    node<Tkey, Tval>* delete_min(node<Tkey, Tval> *h){
+        if(NULL == h){
+            return NULL;
+        }
+        if(h->parent)h->parent->size -= 1;
+
+        if(NULL == h->left){
+            if(NULL == h->parent){
+                this->root = h->right;
+                this->root->parent = NULL;
+            }else{
+                if(h->parent->left == h){
+                    h->parent->left = h->right;
+                }else{
+                    h->parent->right = h->right;
+                }
+                if(h->right) h->right->parent = h->parent;
+            }
+            return h;
+        }else{
+            return delete_min(h->left);
+        }
+    }
+
+    node<Tkey, Tval>* delete_max(node<Tkey, Tval> *h){
+        if(NULL == h){
+            return NULL;
+        }
+        if(h->parent)h->parent->size -= 1;
+
+        if(NULL == h->right){
+            if(NULL == h->parent){
+                this->root = h->left;
+                this->root->parent = NULL;
+            }else{
+                if(h->parent->left == h){
+                    h->parent->left = h->left;
+                }else{
+                    h->parent->right = h->left;
+                }
+                if(h->left) h->left->parent = h->parent;
+            }
+            return h;
+        }else{
+            return delete_max(h->right);
+        }
+    }
     
+
+    node<Tkey, Tval>* remove(Tkey key, node<Tkey, Tval> *h){
+        if(NULL == h){
+            return NULL;
+        }
+        if(key == h->key){
+            if(NULL == h->right){
+                return delete_max(h);
+            }else if(NULL == h->left){
+                return delete_min(h);
+            }
+            node<Tkey, Tval>* subsnode = delete_min(h->right);
+            //delete_min(h->right);
+            subsnode->left = h->left;
+            subsnode->right = h->right;
+            subsnode->parent = h->parent;
+            h->left->parent = subsnode;
+            h->right->parent = subsnode;
+
+            if(h->parent->left == h){
+                h->parent->left = subsnode;
+            }else{
+                h->parent->right = subsnode;
+            }
+
+
+            return h;
+        }else if(key < h->key){
+            return remove(key, h->left);
+        }else{
+            return remove(key, h->right);
+        }
+    }
+
+
   public:
     binary_search_tree() {
         root = NULL;
@@ -192,15 +290,20 @@ class binary_search_tree {
     }
 
     void put(Tkey key, Tval val){
-        put(key, val, root);
+        put(key, val, root, NULL);
     }
 
     Tval get(Tkey key){
         return get(key, root);
     }
 
-    void remove(Tkey key){
-        put(key, 0, root, true);
+    int remove(Tkey key){
+        node<Tkey, Tval>* tmp = remove(key, root);
+        if(tmp){
+            delete tmp;
+            return 0;
+        }
+        return 1;
     }
 
     unsigned size(){
@@ -214,7 +317,7 @@ class binary_search_tree {
         }
         return maxnode->key;
     }
-    Tkey min(){
+    Tkey min_key(){
         node<Tkey, Tval> *minnode = min(root);
         if(NULL == minnode){
             throw KeyNotFoundError();
@@ -229,7 +332,9 @@ class binary_search_tree {
         debug(h->right);
     }
     void debug(){
+        std::cout<<"============="<<std::endl;
         debug(root);
+        std::cout<<"============="<<std::endl;
     }
 
 };
