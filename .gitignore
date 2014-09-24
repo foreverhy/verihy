@@ -8,3 +8,4 @@ main
 *unittest
 *.a
 *.la
+main.cpp

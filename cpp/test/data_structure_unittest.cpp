@@ -180,3 +180,30 @@ TEST(BINARY_SEARCH_TREE, CHANGE){
 //// Did you notice that we didn't register the tests?  The
 //// RUN_ALL_TESTS() macro magically knows about all the tests we
 // defined.  Isn't this convenient?
+TEST(RED_BLACK_TREE, PUTGET){
+    using verihy::data_structure::red_black_tree;
+    red_black_tree<char, int>a;
+    char keys[10]={
+        'A',
+        'C',
+        'E', 
+        'H', 
+        'L', 
+        'M', 
+        'P', 
+        'R', 
+        'S', 
+        'X' 
+    };
+
+    for(int i = 0; i < 10; ++i){
+        a.put(keys[i], i);
+    }
+    for(int i = 0; i < 10; ++i){
+        ASSERT_EQ(i, a.get(keys[i]));
+    }
+    for(int i = 0; i < 10; ++i){
+        red_black_tree<char, int>::node *p = a.find(keys[i]);
+        ASSERT_EQ(i, p->val);
+    }
+}

@@ -9,7 +9,6 @@ namespace verihy {
 
 namespace data_structure{
 
-namespace priority_queue {
 
 template<typename T>
 class priority_queue {
@@ -76,7 +75,6 @@ class priority_queue {
 };
 
 
-}// namespace priority_queue
 
 }// namespace data_structure 
 

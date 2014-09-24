@@ -1,54 +1,38 @@
 #ifndef RED_BLACK_TREE_H
 #define RED_BLACK_TREE_H 1
 
-#include<algorithm>
-#include<exception>
-#include<iostream>
+#include <algorithm>
+#include <exception>
+#include <iostream>
+#include "../exceptions.hpp"
 
 namespace verihy {
 
 namespace data_structure{
 
-namespace red_black_tree{
 
-const int BLACK = false;
-const int RED = true;
-
-template<typename Tkey, typename Tval>
-class node{
-  public:
-    Tkey key;
-    Tval val;
-    node *left, *right;
-    int color;// true = red,  false = black;
-    unsigned size;
-
-    node(Tkey key, Tval val, unsigned size , int color){
-        this->key = key;
-        this->val = val;
-        left = right = NULL;
-        this->color = color;
-        this->size = size;
-    }
-
-    ~node(){}
-};
 
 template<typename Tkey, typename Tval>
 class red_black_tree{
+  public:
+    class node;
   private:
-    node<Tkey, Tval> *root;
 
-    inline bool is_red(node<Tkey, Tval> *h){
+    static const int BLACK = false;
+    static const int RED = true;
+
+    node *root;
+
+    inline bool is_red(node *h){
         return NULL==h?false:(RED==h->color);
     }
 
-    inline unsigned size(node<Tkey, Tval> *h){
+    inline unsigned size(node *h){
         return NULL==h?0:h->size;
     }
 
-    node<Tkey, Tval>* rotate_left(node<Tkey, Tval> *h){
-        node<Tkey, Tval> *x = h->right;
+    node* rotate_left(node *h){
+        node *x = h->right;
         h->right = x->left;
         x->left = h;
         x->color = h->color;
@@ -58,8 +42,8 @@ class red_black_tree{
         return x;
     }
 
-    node<Tkey, Tval>* rotate_right(node<Tkey, Tval> *h){
-        node<Tkey, Tval> *x = h->left;
+    node* rotate_right(node *h){
+        node *x = h->left;
         h->left= x->right;
         x->right= h;
         x->color = h->color;
@@ -69,15 +53,30 @@ class red_black_tree{
         return x;
     }
 
-    inline void flip_colors(node<Tkey, Tval> *h){
+    inline void flip_colors(node *h){
         h->color = RED;
         h->left->color = BLACK;
         h->right->color = BLACK;
     }
 
-    node<Tkey, Tval>* put(Tkey key, Tval val, node<Tkey, Tval> *h){
+    node* get_node(Tkey key, node *h){
         if(NULL == h){
-            return  new node<Tkey, Tval>(key, val, 1, RED);
+            return NULL;
+        }
+
+        if(key == h->key){
+            return h;
+        }else if(key < h->key){
+            return get_node(key, h->left);
+        }else{
+            return get_node(key, h->right);
+        }
+    }
+
+
+    node* put(Tkey key, Tval val, node *h){
+        if(NULL == h){
+            return  new node(key, val, 1, RED);
         }
 
         if(key == h->key){
@@ -104,7 +103,7 @@ class red_black_tree{
 
     
 
-    void debug(node<Tkey, Tval> *h){
+    void debug(node *h){
         using std::cout;
         using std::endl;
         if(NULL == h){
@@ -122,6 +121,27 @@ class red_black_tree{
 
 
   public:
+    class node{
+      private:
+        node *left, *right;
+        int color;// true = red,  false = black;
+        unsigned size;
+
+      public:
+        Tkey key;
+        Tval val;
+        friend class red_black_tree;
+
+        node(Tkey key, Tval val, unsigned size , int color){
+            this->key = key;
+            this->val = val;
+            left = right = NULL;
+            this->color = color;
+            this->size = size;
+        }
+
+        ~node(){}
+    };
     red_black_tree(){
         this->root = NULL;
     }
@@ -129,14 +149,25 @@ class red_black_tree{
         //TODO delete this tree
     }
 
+    Tval get(Tkey key){
+        node *h = get_node(key, root);
+        if(NULL == h){
+            return Tval();
+        }
+        return h->val;
+    }
+
+    node* find(Tkey key){
+        return get_node(key, root);
+    }
+
     void put(Tkey key, Tval val){
         this->root = put(key, val, root);
         this->root->color = BLACK;
     }
     void debug(){debug(root);}
-};
+};// class red_black_tree
 
-}// namespace red_black_tree
 
 
 }// namespace data_structure 
