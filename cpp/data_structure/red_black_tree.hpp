@@ -73,7 +73,7 @@ class red_black_tree{
         }
     }
 
-    inline node* balance(node *h){
+    inline node* balance(node* h){
         if(is_red(h->right) && !is_red(h->left)){
             h = rotate_left(h);
         }
@@ -83,6 +83,7 @@ class red_black_tree{
         if(is_red(h->right) && is_red(h->left)){
             flip_colors(h, RED);
         }
+        h->size = 1 + size(h->left) + size(h->right);
         return h;
     }
 
@@ -108,18 +109,35 @@ class red_black_tree{
         //if(is_red(h->right) && is_red(h->left)){
             //flip_colors(h, RED);
         //}
-        h = balance(h);
+        //h->size = 1 + size(h->left) + size(h->right);
+        return balance(h);
 
-        h->size = 1 + size(h->left) + size(h->right);
+        //return h;
+    }
+
+    node* move_red_left(node *h){
+        flip_colors(h, BLACK);
+        if(is_red(h->right->left)){
+            h->right = rotate_right(h->right);
+            h = rotate_left(h);
+        }
         return h;
     }
 
-
+    // return value
+    //  replace node h
     node* delete_min(node *h){
-        if(NULL == h){
+        if(NULL == h->left){
             return NULL;
         }
-
+        if(!is_red(h->left) && !is_red(h->left->left)){
+            h = move_red_left(h);
+        }
+        h->left = delete_min(h->left);
+        if(is_red(h->right)){
+            h = rotate_left(h);
+        }
+        return balance(h);
     }
     
 
@@ -186,6 +204,13 @@ class red_black_tree{
         this->root->color = BLACK;
     }
     void debug(){debug(root);}
+    void delete_min(){
+        if(!is_red(root->left) && !is_red(root->right)){
+            root->color = RED;
+        }
+        root = delete_min(root);
+        if(root)root->color = BLACK;
+    }
 };// class red_black_tree
 
 
