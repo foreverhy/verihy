@@ -76,57 +76,57 @@
 // Tests Factorial().
 
 // Tests factorial of negative numbers.
-TEST(BINARY_SEARCH_TREE_TEST, PUT) {
-  // This test is named "Negative", and belongs to the "FactorialTest"
-  // test case.
-  using verihy::data_structure::binary_search_tree::binary_search_tree;
-  using verihy::data_structure::binary_search_tree::node;
-  binary_search_tree<char, int> a;
+//TEST(BINARY_SEARCH_TREE_TEST, PUT) {
+  //// This test is named "Negative", and belongs to the "FactorialTest"
+  //// test case.
+  //using verihy::data_structure::binary_search_tree::binary_search_tree;
+  //using verihy::data_structure::binary_search_tree::node;
+  //binary_search_tree<char, int> a;
 
-  a.put('a', 100);
-  a.put('d', 101);
-  a.put('c', 223);
+  //a.put('a', 100);
+  //a.put('d', 101);
+  //a.put('c', 223);
   
-  EXPECT_EQ(a.get('c'), 223);
-  EXPECT_EQ(a.get('d'), 101);
-  EXPECT_EQ(a.get('a'), 100);
+  //EXPECT_EQ(a.get('c'), 223);
+  //EXPECT_EQ(a.get('d'), 101);
+  //EXPECT_EQ(a.get('a'), 100);
 
   
-  //EXPECT_EQ(1, Factorial(-5));
-  //EXPECT_EQ(1, Factorial(-1));
-  //EXPECT_GT(Factorial(-10), 0);
+  ////EXPECT_EQ(1, Factorial(-5));
+  ////EXPECT_EQ(1, Factorial(-1));
+  ////EXPECT_GT(Factorial(-10), 0);
 
-  // <TechnicalDetails>
-  //
-  // EXPECT_EQ(expected, actual) is the same as
-  //
-  //   EXPECT_TRUE((expected) == (actual))
-  //
-  // except that it will print both the expected value and the actual
-  // value when the assertion fails.  This is very helpful for
-  // debugging.  Therefore in this case EXPECT_EQ is preferred.
-  //
-  // On the other hand, EXPECT_TRUE accepts any Boolean expression,
-  // and is thus more general.
-  //
-  // </TechnicalDetails>
-}
+  //// <TechnicalDetails>
+  ////
+  //// EXPECT_EQ(expected, actual) is the same as
+  ////
+  ////   EXPECT_TRUE((expected) == (actual))
+  ////
+  //// except that it will print both the expected value and the actual
+  //// value when the assertion fails.  This is very helpful for
+  //// debugging.  Therefore in this case EXPECT_EQ is preferred.
+  ////
+  //// On the other hand, EXPECT_TRUE accepts any Boolean expression,
+  //// and is thus more general.
+  ////
+  //// </TechnicalDetails>
+//}
 
-TEST(BINARY_SEARCH_TREE, CHANGE){
-  using verihy::data_structure::binary_search_tree::binary_search_tree;
-  using verihy::data_structure::binary_search_tree::node;
-  binary_search_tree<char, int> a;
+//TEST(BINARY_SEARCH_TREE, CHANGE){
+  //using verihy::data_structure::binary_search_tree::binary_search_tree;
+  //using verihy::data_structure::binary_search_tree::node;
+  //binary_search_tree<char, int> a;
 
-  a.put('a', 100);
-  a.put('d', 101);
-  ASSERT_EQ(100, a.get('a'));
-  a.put('a', 223);
+  //a.put('a', 100);
+  //a.put('d', 101);
+  //ASSERT_EQ(100, a.get('a'));
+  //a.put('a', 223);
 
-  ASSERT_EQ(223, a.get('a'));
-  a.remove('d');
+  //ASSERT_EQ(223, a.get('a'));
+  //a.remove('d');
   
 
-}
+//}
 
 // Tests factorial of 0.
 /*TEST(FactorialTest, Zero) {*/

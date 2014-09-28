@@ -18,8 +18,8 @@ class red_black_tree{
     class node;
   private:
 
-    static const int BLACK = false;
-    static const int RED = true;
+    static const int BLACK = 0;
+    static const int RED = 1;
 
     node *root;
 
@@ -53,10 +53,10 @@ class red_black_tree{
         return x;
     }
 
-    inline void flip_colors(node *h){
-        h->color = RED;
-        h->left->color = BLACK;
-        h->right->color = BLACK;
+    inline void flip_colors(node *h, int h_color){
+        h->color = h_color;
+        h->left->color = h_color^1;
+        h->right->color = h_color^1;
     }
 
     node* get_node(Tkey key, node *h){
@@ -73,6 +73,18 @@ class red_black_tree{
         }
     }
 
+    inline node* balance(node *h){
+        if(is_red(h->right) && !is_red(h->left)){
+            h = rotate_left(h);
+        }
+        if(is_red(h->left) && is_red(h->left->left)){
+            h = rotate_right(h);
+        }
+        if(is_red(h->right) && is_red(h->left)){
+            flip_colors(h, RED);
+        }
+        return h;
+    }
 
     node* put(Tkey key, Tval val, node *h){
         if(NULL == h){
@@ -87,20 +99,28 @@ class red_black_tree{
             h->right = put(key, val, h->right);
         }
 
-        if(is_red(h->right) && !is_red(h->left)){
-            h = rotate_left(h);
-        }
-        if(is_red(h->left) && is_red(h->left->left)){
-            h = rotate_right(h);
-        }
-        if(is_red(h->right) && is_red(h->left)){
-            flip_colors(h);
-        }
+        //if(is_red(h->right) && !is_red(h->left)){
+            //h = rotate_left(h);
+        //}
+        //if(is_red(h->left) && is_red(h->left->left)){
+            //h = rotate_right(h);
+        //}
+        //if(is_red(h->right) && is_red(h->left)){
+            //flip_colors(h, RED);
+        //}
+        h = balance(h);
 
         h->size = 1 + size(h->left) + size(h->right);
         return h;
     }
 
+
+    node* delete_min(node *h){
+        if(NULL == h){
+            return NULL;
+        }
+
+    }
     
 
     void debug(node *h){
@@ -124,7 +144,7 @@ class red_black_tree{
     class node{
       private:
         node *left, *right;
-        int color;// true = red,  false = black;
+        int color;// 1 = red,  0 = black;
         unsigned size;
 
       public:
