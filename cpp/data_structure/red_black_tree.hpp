@@ -124,6 +124,13 @@ class red_black_tree{
         return h;
     }
 
+    node* move_red_right(node *h){
+        flip_colors(h, BLACK);
+        if(!is_red(h->left->left)){
+            h = rotate_right(h);
+        }
+        return h;
+    }
     // return value
     //  replace node h
     node* delete_min(node *h){
