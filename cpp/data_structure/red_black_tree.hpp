@@ -59,6 +59,27 @@ class red_black_tree{
         h->right->color = h_color^1;
     }
 
+    node* min_node(node *h){
+        if(NULL == h){
+            return NULL;
+        }
+        if(NULL == h->left){
+            return h;
+        }else{
+            return min_node(h->left);
+        }
+    }
+
+    node* max_node(node *h){
+        if(NULL == h){
+            return NULL;
+        }
+        if(NULL == h->right){
+            return h;
+        }else{
+            return max_node(h->left);
+        }
+    }
     node* get_node(Tkey key, node *h){
         if(NULL == h){
             return NULL;
@@ -146,6 +167,49 @@ class red_black_tree{
         }
         return balance(h);
     }
+
+    node* delete_max(node *h){
+        if(is_red(h->left)){
+            h = rotate_right(h);
+        }
+        if(NULL == h->right){
+            return NULL;
+        }
+        if(!is_red(h->right) && !is_red(h->right->left)){
+            h = move_red_right(h);
+        }
+        h->right = delete_max(h->right);
+        return balance(h);
+    }
+
+    node* delete_node(node *h, Tkey key){
+        if(key < h->key){
+            if(!is_red(h->left) && !is_red(h->left->left)){
+                h = move_red_left(h);
+            }
+            h->left = delete_node(h->left, key);
+
+        }else{
+            if(is_red(h->left)){
+                h = rotate_right(h);
+            }
+            if(key == h->key && NULL == h->right){
+                return NULL;
+            }
+            if(!is_red(h->right) && !is_red(h->right->left)){
+                h = move_red_right(h);
+            }
+            if(key == h->key){
+                node *tmp = min_node(h->right);
+                h->key = tmp->key;
+                h->val = tmp->val;
+                delete_min(h->right);
+            }else{
+                h->right = delete_node(h->right, key);
+            }
+        }
+        return balance(h);
+    }
     
 
     void debug(node *h){
@@ -216,6 +280,21 @@ class red_black_tree{
             root->color = RED;
         }
         root = delete_min(root);
+        if(root)root->color = BLACK;
+    }
+    void delete_max(){
+        if(!is_red(root->left) && !is_red(root->right)){
+            root->color = RED;
+        }
+        root = delete_max(root);
+        if(root)root->color = BLACK;
+    }
+
+    void delete_key(Tkey key){
+        if(!is_red(root->left) && !is_red(root->right)){
+            root->color = RED;
+        }
+        root = delete_node(root, key);
         if(root)root->color = BLACK;
     }
 };// class red_black_tree
