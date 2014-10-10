@@ -46,6 +46,7 @@
 #include <limits.h>
 #include "gtest/gtest.h"
 #include "../data_structure.hpp"
+#include <random>
 
 
 // Step 2. Use the TEST macro to define your tests.
@@ -206,4 +207,37 @@ TEST(RED_BLACK_TREE, PUTGET){
         red_black_tree<char, int>::node *p = a.find(keys[i]);
         ASSERT_EQ(i, p->val);
     }
+}
+
+TEST(RED_BLACK_TREE, DELETE){
+    using verihy::data_structure::red_black_tree;
+    red_black_tree<char, int>a;
+    char keys[10]={
+        'A',
+        'C',
+        'E', 
+        'H', 
+        'L', 
+        'M', 
+        'P', 
+        'R', 
+        'S', 
+        'X' 
+    };
+
+    for(int i = 0; i < 10; ++i){
+        a.put(keys[i], i);
+    }
+    for(int i = 0; i < 10; ++i){
+        ASSERT_EQ(i, a.get(keys[i]));
+    }
+    
+    std::random_device rd;
+    int k = rd()%10;
+    red_black_tree<char, int>::node *p = a.find(keys[k]);
+    ASSERT_EQ(k, p->val);
+    a.delete_key(keys[k]);
+    p = a.find(keys[k]);
+    ASSERT_EQ(NULL, p);
+
 }
