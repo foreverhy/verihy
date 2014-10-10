@@ -228,6 +228,14 @@ class red_black_tree{
 
     }
 
+    void delete_tree(node *h){
+        if(NULL == h){
+            return;
+        }
+        delete_tree(h->left);
+        delete_tree(h->right);
+        delete h;
+    }
 
   public:
     class node{
