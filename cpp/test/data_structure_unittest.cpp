@@ -241,3 +241,8 @@ TEST(RED_BLACK_TREE, DELETE){
     ASSERT_EQ(NULL, p);
 
 }
+
+TEST(SPLAY_TREE, CONSTRUCTOR){
+    using verihy::data_structure::splay_tree;
+    splay_tree<char, int>a;
+}

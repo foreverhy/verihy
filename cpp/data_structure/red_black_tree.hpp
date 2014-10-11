@@ -263,7 +263,7 @@ class red_black_tree{
         this->root = NULL;
     }
     ~red_black_tree(){
-        //TODO delete this tree
+        delete_tree(root);
     }
 
     Tval get(Tkey key){
