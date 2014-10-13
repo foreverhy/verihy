@@ -31,14 +31,17 @@ class splay_tree{
         node *y = h->parent, *b = h->right;
         h->right = y;
         h->parent = y->parent;
-        if(0 == left_right(y)){
+        if(y->parent && 0 == left_right(y)){
             y->parent->left = h;
-        }else{
+        }
+        if(y->parent && 1 == left_right(y)){
             y->parent->right = h;
         }
         y->parent = h;
-        b->parent = y;
         y->left = b;
+        if(b){
+            b->parent = y;
+        }
         return h;
     }
     
@@ -46,19 +49,23 @@ class splay_tree{
         node *y = h->parent, *b = h->left;
         h->left = y;
         h->parent = y->parent;
-        if(0 == left_right(y)){
+        if(y->parent && 0 == left_right(y)){
             y->parent->left = h;
-        }else{
+        }
+        if(y->parent && 1 == left_right(y)){
             y->parent->right = h;
         }
         y->parent = h;
-        b->parent = y;
         y->right = b;
+        if(b){
+            b->parent = y;
+        }
         return h;
     }
 
-    void splay(node *h){
+    void splay(node* h){
         while(h->parent){
+
             if(root == h->parent){
                 if(h->parent->left == h){
                     rotate_right(h);
@@ -72,7 +79,6 @@ class splay_tree{
                 }else{
                     rotate_left(h->parent);
                     rotate_left(h);
-
                 }
             }else{
                 if(0 == left_right(h)){
@@ -83,8 +89,28 @@ class splay_tree{
                     rotate_right(h);
                 }
             }
+
         }
+        this->root = h;
+    }// void splay(node *h);
+
+    void debug(node *h){
+        using std::cout;
+        using std::endl;
+        if(NULL == h){
+            return;
+        }
+        cout<<"=========="<<endl;
+        //cout<<h->key<<" : "<<h->val<<"  SIZE: "<<h->size<<(h->color==RED?"   [RED]":"   [BLACK]")<<endl;
+        cout<<h->key<<" : "<<h->val<<endl;
+        cout<<(h->left?h->left->key:' ')<<"<--    -->"<<(h->right?h->right->key:' ')<<endl;
+        cout<<"=========="<<endl;
+
+        debug(h->left);
+        debug(h->right);
+
     }
+
 
   public:
 
@@ -102,6 +128,7 @@ class splay_tree{
             this->key = key;
             this->val = val;
             this->size = size;
+            this->left = this->right = this->parent = NULL;
         }
         ~node(){;}
     };// class splay_tree::node
@@ -111,6 +138,42 @@ class splay_tree{
         this->size = 1;
     }
     ~splay_tree(){
+    }
+    void put(Tkey key, Tval val){
+        if(NULL == root){
+            this->root = new node(key, val);
+            return;
+        }
+        node *h = root;
+        node *pre = NULL;
+        while(h){
+           if(key == h->key){
+                h->val = val;
+                break;
+           }else if(key < h->key){
+               pre = h;
+               h = h->left;
+           }else{
+               pre = h;
+               h = h->right;
+           }
+        }
+        if(NULL == h){
+            h = new node(key, val);
+            h->parent = pre;
+            if(key < pre->key){
+                pre->left = h;
+            }else{
+                pre->right = h;
+            }
+        }
+        splay(h);
+    }
+
+    void debug(){
+        std::cout<<"****************"<<std::endl;
+        debug(root);
+        std::cout<<"****************"<<std::endl;
     }
 
 };
