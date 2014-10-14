@@ -49,6 +49,7 @@ all : $(TESTS)
 clean :
 	rm -f $(TESTS) gtest.a gtest_main.a *.o
 
+
 # Builds gtest.a and gtest_main.a.
 
 # Usually you shouldn't tweak such internal variables, indicated by a
@@ -80,7 +81,8 @@ gtest_main.a : gtest-all.o gtest_main.o
 
 
 data_structure_unittest.o : $(TEST_DIR)/data_structure_unittest.cpp \
-							$(USER_DIR)/data_structure.hpp $(GTEST_HEADERS)
+							$(USER_DIR)/data_structure.hpp $(GTEST_HEADERS) \
+							$(USER_DIR)/data_structure/*.hpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(TEST_DIR)/data_structure_unittest.cpp 
 
 data_structure_unittest :  data_structure_unittest.o gtest_main.a

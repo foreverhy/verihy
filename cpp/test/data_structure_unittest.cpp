@@ -246,3 +246,53 @@ TEST(SPLAY_TREE, CONSTRUCTOR){
     using verihy::data_structure::splay_tree;
     splay_tree<char, int>a;
 }
+
+TEST(SPLAY_TREE, OPS){
+    using verihy::data_structure::splay_tree;
+    splay_tree<char, int>a;
+    char keys[18]={
+        'C',
+        'M', 
+        'A',
+        'H', 
+        'E', 
+        'X', 
+        'L', 
+        'B', 
+        'G', 
+        'F', 
+        'J', 
+        'I', 
+        'Z', 
+        'Y', 
+        'a', 
+        'R', 
+        'P', 
+        'S', 
+    };
+
+    for(int i = 0; i < 18; ++i){
+        a.put(keys[i], i);
+    }
+
+    using std::random_device;
+    using std::mt19937;
+    random_device rd;
+    mt19937 mt(rd());
+    
+    for(int i = 0; i < 1000; ++i){
+        int k = mt()%18;
+        EXPECT_EQ(k, a.get(keys[k]));
+    }
+
+    using std::cout;
+    using std::endl;
+    for(int i = 0; i < 100000; ++i){
+        int k = mt()%18;
+        EXPECT_EQ(k, a.find(keys[k])->val);
+        a.delete_key(keys[k]);
+        EXPECT_EQ(NULL, a.find(keys[k]));
+        a.put(keys[k], k);
+    }
+
+}
