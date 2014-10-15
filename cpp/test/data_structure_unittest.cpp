@@ -340,3 +340,26 @@ TEST(TRIE_TREE, INSERT){
     EXPECT_EQ(1, a.counts("habc"));
 
 }
+TEST(TRIE_TREE, STARTS_WITH){
+    using verihy::data_structure::trie_tree;
+    using std::vector;
+    using std::string;
+    vector<string> ori ={
+        "h", 
+        "hbc", 
+        "heabc", 
+        "hello", 
+        "hez", 
+    };
+    trie_tree a;
+    for(std::size_t i = 0; i< ori.size(); ++i){
+        a.insert(ori[i]);
+    }
+    vector<string> res = a.starts_with("h");
+    ASSERT_EQ(ori.size(), res.size());
+    for(std::size_t i = 0; i< ori.size(); ++i){
+        EXPECT_EQ(res[i], ori[i]);
+    }
+
+
+}

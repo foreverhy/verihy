@@ -38,7 +38,8 @@ class trie_tree{
 
     int delete_node(node *pre, bool is_right, node *h);
 
-    //std::vector<std::string&>& sumup(node *h);
+    void dfs_string(node *h, std::string word, std::vector<std::string> &res);
+
 
   public:
     trie_tree();
@@ -62,7 +63,7 @@ class trie_tree{
 
     // return a vector contains all words starts with
     //  string s in this trie
-    const std::vector<const std::string&>& starts_with(const std::string &s);
+    std::vector<std::string> starts_with(const std::string &s);
 
 
 

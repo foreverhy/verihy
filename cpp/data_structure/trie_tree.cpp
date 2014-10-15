@@ -149,16 +149,22 @@ void trie_tree::remove(const string &str, bool hardmode){
 
 //}
 //
-#if 1
 
-const vector<const string&>& trie_tree::starts_with(
+void trie_tree::dfs_string(node *h, string word, vector<string> &res){
+    if(!h)return ;
+    if(h->word_counts){
+        res.push_back(word + h->data);
+    }
+    dfs_string(h->lchd, word+h->data, res);
+    dfs_string(h->right, word, res);
+}
+
+vector<string> trie_tree::starts_with(
         const string &str
         ){
     node *h = root->lchd;
     string::const_iterator cur = str.begin();
-    //vector<const string&&> result;
-    //TODO
-    vector<const string&> result;
+    vector<string> result;
     while(cur != str.end()){
         if(!h) break;
 
@@ -172,11 +178,14 @@ const vector<const string&>& trie_tree::starts_with(
         }
         h = h->right;
     }
-    
+    if(!h)return result;
+    string word = str;
+    if(h->word_counts)result.push_back(word);
+    dfs_string(h->lchd, word, result);
+    return result;
 
 }
 
-#endif
 
 
 }// namespace data_structure
