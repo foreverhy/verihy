@@ -296,3 +296,47 @@ TEST(SPLAY_TREE, OPS){
     }
 
 }
+
+TEST(TRIE_TREE, INSERT){
+    using verihy::data_structure::trie_tree;
+    trie_tree a;
+    a.insert("hello");
+    EXPECT_EQ(1, a.counts("hello"));
+    a.insert("hello");
+    a.insert("habc");
+    EXPECT_EQ(2, a.counts("hello"));
+    EXPECT_EQ(0, a.counts("helloo"));
+    EXPECT_EQ(0, a.counts("hell"));
+    EXPECT_EQ(0, a.counts("a"));
+    EXPECT_EQ(0, a.counts(""));
+    EXPECT_EQ(1, a.counts("habc"));
+    EXPECT_EQ(0, a.counts("h"));
+
+
+    EXPECT_EQ(2, a.ex_counts("hel"));
+    EXPECT_EQ(3, a.ex_counts("h"));
+
+    a.insert("nice to meet you");
+    EXPECT_EQ(1, a.counts("nice to meet you"));
+    EXPECT_EQ(1, a.ex_counts("nice "));
+
+    a.remove("hello");
+    EXPECT_EQ(1, a.counts("hello"));
+    EXPECT_EQ(0, a.counts("helloo"));
+    EXPECT_EQ(0, a.counts("hell"));
+
+    a.remove("hello");
+    EXPECT_EQ(0, a.counts("hello"));
+    a.remove("hello");
+
+    EXPECT_EQ(0, a.counts("hello"));
+    EXPECT_EQ(1, a.ex_counts("h"));
+    a.insert("hello");
+    a.insert("helloworld");
+    a.remove("hello", true);
+    EXPECT_EQ(2, a.ex_counts("h"));
+    EXPECT_EQ(0, a.counts("hello"));
+    EXPECT_EQ(1, a.ex_counts("hello"));
+    EXPECT_EQ(1, a.counts("habc"));
+
+}

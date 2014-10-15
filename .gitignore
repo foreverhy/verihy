@@ -10,3 +10,4 @@ main
 *.la
 main.cpp
 *.swp
+lib/

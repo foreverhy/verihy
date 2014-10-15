@@ -22,6 +22,11 @@ USER_DIR = ..
 # Where to find test code.
 TEST_DIR = .
 
+# Where to link my shared lib
+LINK_DIR = ../../lib
+LINK_DIR = /home/mactavish/workspace/verihy/lib
+LINKFLAGS = -L$(LINK_DIR) -ltrie_tree
+
 # Flags passed to the preprocessor.
 # Set Google Test's header directory as a system directory, such that
 # the compiler doesn't generate warnings in Google Test headers.
@@ -31,11 +36,11 @@ CPPFLAGS += -isystem $(GTEST_DIR)/include
 CXX = clang++
 
 # Flags passed to the C++ compiler.
-CXXFLAGS += -g -Wall -Wextra -pthread -std=c++0x
+CXXFLAGS += -g -Wall -Wextra -pthread -std=c++0x 
 
 # All tests produced by this Makefile.  Remember to add new tests you
 # created to the list.
-TESTS = data_structure_unittest
+TESTS = data_structure_unittest 
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -47,7 +52,7 @@ GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
 all : $(TESTS)
 
 clean :
-	rm -f $(TESTS) gtest.a gtest_main.a *.o
+	rm -f $(TESTS) gtest.a gtest_main.a *.o $(LINK_DIR)/*.so $(LINK_DIR)/*.a
 
 
 # Builds gtest.a and gtest_main.a.
@@ -82,9 +87,15 @@ gtest_main.a : gtest-all.o gtest_main.o
 
 data_structure_unittest.o : $(TEST_DIR)/data_structure_unittest.cpp \
 							$(USER_DIR)/data_structure.hpp $(GTEST_HEADERS) \
-							$(USER_DIR)/data_structure/*.hpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(TEST_DIR)/data_structure_unittest.cpp 
+							$(USER_DIR)/data_structure/*.hpp \
+							$(USER_DIR)/data_structure/*.cpp \
+							$(USER_DIR)/data_structure/*.h \
+							trie_tree.so
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS)  -c $(TEST_DIR)/data_structure_unittest.cpp $(LINKFLAGS)
 
 data_structure_unittest :  data_structure_unittest.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS)  -lpthread $^ -o $@ $(LINKFLAGS)
+
+trie_tree.so :$(USER_DIR)/data_structure.hpp $(USER_DIR)/data_structure/trie_tree.*
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(USER_DIR)/data_structure/trie_tree.cpp -fPIC -shared -o $(LINK_DIR)/libtrie_tree.so
 
