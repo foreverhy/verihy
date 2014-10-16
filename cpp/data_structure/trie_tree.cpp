@@ -9,9 +9,8 @@ using std::string;
 using std::vector;
 
 
-trie_tree::trie_tree(){
+trie_tree::trie_tree():size(0){
     root = new node(0);
-    size = 0;
 }
 
 void trie_tree::delete_tree(node *h){

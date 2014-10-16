@@ -21,11 +21,8 @@ class trie_tree{
 
         node *lchd, *right;
 
-        node(char data, int count = 0, int word_counts = 0){
-            this->data = data;
-            this->counts = count;
-            this->word_counts = word_counts;
-            lchd = right = NULL;
+        node(char data, int counts = 0, int word_counts = 0):data(data), counts(counts),\
+            word_counts(word_counts), lchd(NULL), right(NULL){
         }
     };
 
