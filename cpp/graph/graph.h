@@ -1,5 +1,5 @@
-#ifndef BASE_GRAPH_H
-#define BASE_GRAPH_H 1
+#ifndef VERIHY_GRAPH_GRAPH_H
+#define VERIHY_GRAPH_GRAPH_H 1
 
 #include <cstdlib>
 #include <vector>
@@ -30,23 +30,30 @@ class graph{
         vertex(unsigned idx):index(idx), next_edge(NULL){ 
         }
         void add(unsigned v);
-        bool has_edge(unsigned v);
+        bool has_edge(unsigned v)const;
+        unsigned count()const;
 
     };
 
-    bool has_edge(unsigned u, unsigned v);
 
     std::vector<std::shared_ptr<vertex> > adj; 
 
   public:
     graph(unsigned v);
     ~graph();
-    unsigned V(){ return num_vertex; }
-    unsigned E(){ return num_edge; }
-    void add_edge(unsigned v, unsigned w);
+    unsigned V()const{ return num_vertex; }
+    unsigned E()const{ return num_edge; }
+    bool has_edge(unsigned u, unsigned v)const;
+    void list_adj(unsigned u)const;
+    std::vector<unsigned> adj_vertics(unsigned u)const;
+    unsigned count(unsigned u)const;
+
+    void add_edge(unsigned u, unsigned v);
     
     
 }; // class graph
+
+
 
 } // namespace graph
 

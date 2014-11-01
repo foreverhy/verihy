@@ -107,5 +107,5 @@ graph_unittest.o: $(TEST_DIR)/graph_unittest.cpp $(USER_DIR)/graph.h $(GTEST_HEA
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS)  -c $(TEST_DIR)/graph_unittest.cpp $(LINKFLAGS)
 					
 
-libgraph.so:$(USER_DIR)/graph.h $(USER_DIR)/graph/*.h $(USER_DIR)/graph/*.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(USER_DIR)/graph/*.cpp -fPIC --shared -o $(LINK_DIR)/libgraph.so
+libgraph.so:$(USER_DIR)/graph.h $(USER_DIR)/graph/graph*.h $(USER_DIR)/graph/graph*.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(USER_DIR)/graph/graph*.cpp -fPIC --shared -o $(LINK_DIR)/libgraph.so

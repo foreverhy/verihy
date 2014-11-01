@@ -1,22 +1,23 @@
 
-LINKFLAGS = -L$(LINK_DIR) -ltrie_tree
+LINKFLAGS = -L$(LINK_DIR) -lgraph
 CXX = clang++
 CXXFLAGS += -g -Wall -Wextra -std=c++0x 
-GRAPHS = test
 
 LINK_DIR = ../../lib
 
-all : $(GRAPHS)
 
-clean :
-	rm -f $(GRAPHs) *.o $(LINK_DIR)/libgraph.so $(LINK_DIR)/libgraph.a
 
 test:libgraph.so test.o
-	$(CXX) test.o -L$(LINK_DIR) -lgraph -o test
+	$(CXX) test.o $(LINKFLAGS) -o test
 
 
-test.o:test.cpp base_graph.h
+test.o:test.cpp graph.h
 	$(CXX) $(CXXFLAGS) -c test.cpp
 
-libgraph.so:*.h *.cpp
-	$(CXX) $(CXXFLAGS) -fPIC --shared *.cpp -o $(LINK_DIR)/libgraph.so
+libgraph.so:graph.h graph.cpp
+	$(CXX) $(CXXFLAGS) -fPIC --shared graph.cpp -o $(LINK_DIR)/libgraph.so
+
+.PHONY:clean
+
+clean :
+	rm -f test *.o $(LINK_DIR)/libgraph.so $(LINK_DIR)/libgraph.a
