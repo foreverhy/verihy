@@ -25,7 +25,7 @@ TEST_DIR = .
 # Where to link my shared lib
 LINK_DIR = ../../lib
 LINK_DIR = /home/mactavish/workspace/verihy/lib
-LINKFLAGS = -L$(LINK_DIR) -ltrie_tree
+LINKFLAGS = -L$(LINK_DIR) -ltrie_tree -L$(LINK_DIR) -lgraph
 
 # Flags passed to the preprocessor.
 # Set Google Test's header directory as a system directory, such that
@@ -40,7 +40,7 @@ CXXFLAGS += -g -Wall -Wextra -pthread -std=c++0x
 
 # All tests produced by this Makefile.  Remember to add new tests you
 # created to the list.
-TESTS = data_structure_unittest 
+TESTS = data_structure_unittest graph_unittest
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -99,3 +99,13 @@ data_structure_unittest :  data_structure_unittest.o gtest_main.a
 trie_tree.so :$(USER_DIR)/data_structure.hpp $(USER_DIR)/data_structure/trie_tree.*
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(USER_DIR)/data_structure/trie_tree.cpp -fPIC -shared -o $(LINK_DIR)/libtrie_tree.so
 
+graph_unittest:graph_unittest.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS)  -lpthread $^ -o $@ $(LINKFLAGS)
+
+graph_unittest.o: $(TEST_DIR)/graph_unittest.cpp $(USER_DIR)/graph.h $(GTEST_HEADERS) $(USER_DIR)/graph/*.h \
+	$(USER_DIR)/graph/*.cpp libgraph.so
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS)  -c $(TEST_DIR)/graph_unittest.cpp $(LINKFLAGS)
+					
+
+libgraph.so:$(USER_DIR)/graph.h $(USER_DIR)/graph/*.h $(USER_DIR)/graph/*.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(USER_DIR)/graph/*.cpp -fPIC --shared -o $(LINK_DIR)/libgraph.so
