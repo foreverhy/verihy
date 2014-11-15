@@ -16,6 +16,46 @@ class search{
     unsigned count(unsigned );
 };
 
+class path{
+  private:
+    const graph &G;
+    const unsigned src;
+    bool *marked;
+    unsigned *edge_to;
+  public:
+    path(const graph &g, unsigned s):G(g),src(s){
+        marked = new bool[g.V()]();
+        edge_to = new unsigned[g.V()]();
+    }
+    ~path(){
+        delete []marked;
+        delete []edge_to;
+    }
+    bool has_path_to(unsigned v);
+    std::vector<unsigned> path_to(unsigned v);
+};
+
+class depth_first_path{
+  private:
+    const graph &G;
+    const unsigned src;
+    bool *marked;
+    unsigned *edge_to;
+    
+    void dfs(unsigned )const;
+  public:
+    depth_first_path(const graph &g, unsigned s):G(g),src(s){
+        marked = new bool[g.V()]();
+        edge_to = new unsigned[g.V()]();
+        dfs(s);
+    }
+    ~depth_first_path(){
+        delete []marked;
+        delete []edge_to;
+    }
+    bool has_path_to(unsigned v);
+    std::vector<unsigned> path_to(unsigned v);
+};
 
 }// namespace graph
 

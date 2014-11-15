@@ -14,8 +14,8 @@ test:libgraph.so test.o
 test.o:test.cpp graph.h
 	$(CXX) $(CXXFLAGS) -c test.cpp
 
-libgraph.so:graph.h graph.cpp
-	$(CXX) $(CXXFLAGS) -fPIC --shared graph.cpp -o $(LINK_DIR)/libgraph.so
+libgraph.so:graph.h graph.cpp graph_search.h graph_search.cpp
+	$(CXX) $(CXXFLAGS) -fPIC --shared graph.cpp graph_search.cpp -o $(LINK_DIR)/libgraph.so
 
 .PHONY:clean
 

@@ -62,7 +62,7 @@ std::vector<unsigned> graph::adj_vertics(unsigned u)const{
     return ans;
 }
 
-unsigned graph::vertex::count()const{
+unsigned graph::vertex::degree()const{
     auto ans = 0u;
     for(auto e = next_edge; e; e = e->next){
         ++ans;
@@ -70,8 +70,8 @@ unsigned graph::vertex::count()const{
     return ans;
 }
 
-unsigned graph::count(unsigned u)const{
-    return adj[u]->count();
+unsigned graph::degree(unsigned u)const{
+    return adj[u]->degree();
 }
 
 

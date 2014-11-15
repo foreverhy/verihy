@@ -31,7 +31,7 @@ class graph{
         }
         void add(unsigned v);
         bool has_edge(unsigned v)const;
-        unsigned count()const;
+        unsigned degree()const;
 
     };
 
@@ -46,7 +46,7 @@ class graph{
     bool has_edge(unsigned u, unsigned v)const;
     void list_adj(unsigned u)const;
     std::vector<unsigned> adj_vertics(unsigned u)const;
-    unsigned count(unsigned u)const;
+    unsigned degree(unsigned u)const;
 
     void add_edge(unsigned u, unsigned v);
     
