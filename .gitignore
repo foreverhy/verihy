@@ -11,3 +11,4 @@ main
 main.cpp
 *.swp
 lib/
+test*

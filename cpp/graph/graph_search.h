@@ -17,7 +17,7 @@ class search{
 };
 
 class path{
-  private:
+  protected:
     const graph &G;
     const unsigned src;
     bool *marked;
@@ -27,35 +27,38 @@ class path{
         marked = new bool[g.V()]();
         edge_to = new unsigned[g.V()]();
     }
-    ~path(){
+    virtual ~path(){
         delete []marked;
         delete []edge_to;
     }
-    bool has_path_to(unsigned v);
-    std::vector<unsigned> path_to(unsigned v);
+    bool has_path_to(unsigned v)const;
+    std::vector<unsigned> path_to(unsigned v)const;
 };
 
-class depth_first_path{
+class depth_first_path:public path{
   private:
-    const graph &G;
-    const unsigned src;
-    bool *marked;
-    unsigned *edge_to;
-    
     void dfs(unsigned )const;
+
   public:
-    depth_first_path(const graph &g, unsigned s):G(g),src(s){
-        marked = new bool[g.V()]();
-        edge_to = new unsigned[g.V()]();
+    depth_first_path(const graph &g, unsigned s):path(g,s) 
+    {
         dfs(s);
     }
     ~depth_first_path(){
-        delete []marked;
-        delete []edge_to;
     }
-    bool has_path_to(unsigned v);
-    std::vector<unsigned> path_to(unsigned v);
+};//class depth_first_path
+
+class breadth_first_path:public path {
+  private:
+    void bfs(unsigned)const;
+  public:
+    breadth_first_path(const graph &g, unsigned s):path(g,s){
+        bfs(s);
+    }
+    ~breadth_first_path(){}
 };
+
+
 
 }// namespace graph
 
