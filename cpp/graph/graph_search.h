@@ -1,6 +1,7 @@
 #ifndef VERIHY_GRAPH_SEARCH_H
 #define VERIHY_GRAPH_SEARCH_H 1
 #include <vector>
+#include <cstring>
 #include "../graph.h"
 
 namespace verihy{
@@ -58,6 +59,61 @@ class breadth_first_path:public path {
     ~breadth_first_path(){}
 };
 
+class CC{
+  private:
+    const graph &G;
+    bool *marked;
+    int *id;
+    int count;
+
+    void dfs(unsigned u)const;
+  public:
+    CC(const graph &g):G(g),count(0){
+        marked = new bool[G.V()];
+        id = new int[G.V()]();
+        //std::memset(marked, false, G.V());
+        //std::memset(id, 0, G.V());
+        for(unsigned s = 0; s < G.V(); ++s){
+            if(!marked[s]) {
+                dfs(s);
+                count++;
+            }
+        }
+    }
+    ~CC(){
+        delete []marked;
+        delete []id;
+    }
+    bool connected(unsigned u, unsigned v)const;
+    int ccs()const;
+};// class CC
+
+class cycle{
+  private:
+    const graph &G;
+    bool *marked;
+    bool h_cycle;
+    
+    void dfs(unsigned, unsigned);
+
+  public:
+    cycle(const graph &g):G(g),h_cycle(false){
+        marked = new bool[G.V()];
+        std::memset(marked, false, G.V());
+        for(unsigned s = 0; s < G.V(); ++s){
+            if(!marked[s]){
+                dfs(s, s);
+            }
+        }
+    }
+    ~cycle(){
+        delete []marked;
+    }
+    bool has_cycle(){
+        return h_cycle;
+    }
+
+};
 
 
 }// namespace graph

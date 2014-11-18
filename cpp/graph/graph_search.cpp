@@ -56,9 +56,34 @@ void breadth_first_path::bfs(unsigned u)const{
 }
 
 
+void CC::dfs(unsigned u) const{
+    marked[u] = true;
+    id[u] = count;
+    for(auto v: G.adj_vertics(u)){
+        if(!marked[v]){
+            dfs(v);
+        }
+    }
+}// void depth_first_path::dfs()
 
+bool CC::connected(unsigned u, unsigned v)const{
+    return id[u] == id[v];
+}
 
+int CC::ccs()const{
+    return count;
+}
 
+void cycle::dfs(unsigned u, unsigned v){
+        marked[u] = true;
+        for(auto w : G.adj_vertics(u)){
+            if(!marked[w]){
+                dfs(w, u);
+            }else if(w != v){
+                h_cycle = true;
+            }
+        }
+    }
 }// namespace graph
 
 }// namespace verihy
