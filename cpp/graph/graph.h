@@ -38,6 +38,11 @@ class graph{
 
     std::vector<std::shared_ptr<vertex> > adj; 
 
+    //disable auto copy constructors & copy assignment
+    // declare as private , not to implement
+    graph(const graph&);
+    graph& operator=(const graph&);
+
   public:
     graph(unsigned v);
     ~graph();

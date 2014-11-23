@@ -1,0 +1,6 @@
+#ifndef VERIHY_DIGRAPH_H
+#define VERIHY_DIGRAPH_H 1
+
+
+
+#endif // VERIHY_DIGRAPH_H
