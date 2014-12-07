@@ -25,7 +25,7 @@ TEST_DIR = .
 # Where to link my shared lib
 LINK_DIR = ../../lib
 LINK_DIR = /home/mactavish/workspace/verihy/lib
-LINKFLAGS = -L$(LINK_DIR) -ltrie_tree -L$(LINK_DIR) -lgraph
+LINKFLAGS = -L$(LINK_DIR) -ltrie_tree -L$(LINK_DIR) -lgraph -L$(LINK_DIR) -lmath
 
 # Flags passed to the preprocessor.
 # Set Google Test's header directory as a system directory, such that
@@ -105,7 +105,17 @@ graph_unittest:graph_unittest.o gtest_main.a
 graph_unittest.o: $(TEST_DIR)/graph_unittest.cpp $(USER_DIR)/graph.h $(GTEST_HEADERS) $(USER_DIR)/graph/*.h \
 	$(USER_DIR)/graph/*.cpp libgraph.so
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS)  -c $(TEST_DIR)/graph_unittest.cpp $(LINKFLAGS)
+
+math_unittest:math_unittest.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS)  -lpthread $^ -o $@ $(LINKFLAGS)
+
+math_unittest.o: $(TEST_DIR)/math_unittest.cpp $(USER_DIR)/math.h $(GTEST_HEADERS) $(USER_DIR)/math/*.h \
+	$(USER_DIR)/math/*.cpp libmath.so
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS)  -c $(TEST_DIR)/math_unittest.cpp $(LINKFLAGS)
 					
 
 libgraph.so:$(USER_DIR)/graph.h $(USER_DIR)/graph/graph*.h $(USER_DIR)/graph/graph*.cpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(USER_DIR)/graph/graph*.cpp -fPIC --shared -o $(LINK_DIR)/libgraph.so
+
+libmath.so:$(USER_DIR)/math.h $(USER_DIR)/math/*.h $(USER_DIR)/math/*.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(USER_DIR)/math/*.cpp -fPIC --shared -o $(LINK_DIR)/libmath.so
