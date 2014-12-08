@@ -2,6 +2,9 @@
 #include <iomanip>
 #include <cstring>
 #include <cctype>
+#include <iostream>
+
+#define VERIHY_DEBUG false
 
 namespace verihy{
 
@@ -27,18 +30,25 @@ big_int::big_int(int val):_positive(0){
     _fix_pre_zeros();
 }
 
-big_int::big_int(const big_int& rhs):_positive(0){
-    _positive = rhs._positive;
-    _val = rhs._val;
-    //for(auto val: rhs._val){
-        //_val.push_back(val);
-    //}
+big_int::big_int(big_int &&rhs)noexcept:_positive(rhs._positive),_val(rhs._val){
+#if VERIHY_DEBUG
+    std::cout << "move constructor of " << std::endl;
+#endif
+}
+
+big_int::big_int(const big_int& rhs):_positive(rhs._positive),_val(rhs._val){
+#if VERIHY_DEBUG
+    std::cout << "copy constructor of " << rhs << std::endl;
+#endif
 }
 
 big_int::big_int(const std::string& str):big_int(str.c_str()){
 }
 
 big_int::big_int(const char* _str):_positive(0){
+#if VERIHY_DEBUG
+    std::cout << "char* constructor of " << _str << std::endl;
+#endif
     char* str = _pre_trans(_str, _positive);
     bool zero = true;
     if(str){
@@ -118,11 +128,14 @@ std::ostream& operator<<(std::ostream& os, const big_int& rhs){
 }
 
 big_int& big_int::operator=(const big_int& rhs){
+#if VERIHY_DEBUG
+    std::cout << "copy-assignment of " << rhs << std::endl;
+#endif
+    if(&rhs == this){
+        return *this;
+    }
     _positive = rhs._positive;
     _val = rhs._val;
-    //for(auto val: rhs._val){
-        //_val.push_back(val);
-    //}
     return *this;
 }
 

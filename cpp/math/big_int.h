@@ -11,13 +11,17 @@ namespace verihy{
 namespace math{
 
 
+//TODO
+// move constructor
+// move assignment operator
+// move +-*/ operator
 class big_int{
   private:
+    int _positive;
     std::vector<int> _val;
     // 1 positive
     // 0 zero
     // -1 negative
-    int _positive;
     static const int _bit = 4;
     static const int _base = 10000;
     static const int _visual_base = 10;
@@ -53,8 +57,9 @@ class big_int{
     }
     big_int(int val);
     big_int(const char* str);
-    big_int(const std::string& str);
-    big_int(const big_int& bint);
+    big_int(const std::string &str);
+    big_int(const big_int &bint);
+    big_int(big_int &&rhs)noexcept;
     big_int& operator= (const big_int& bint);
     big_int operator+ (const big_int& rhs);
     big_int operator- (const big_int& rhs);
@@ -78,11 +83,6 @@ class big_int{
 
 std::ostream& operator<< (std::ostream& os, const big_int& rhs);
 
-class debug{
-  public:
-    static int _ratoi(const char* _str){
-    }
-};
 
 }// namespace math
 
