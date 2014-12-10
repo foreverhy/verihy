@@ -12,8 +12,6 @@ namespace math{
 
 
 //TODO
-// move constructor
-// move assignment operator
 // move +-*/ operator
 class big_int{
   private:
@@ -22,9 +20,13 @@ class big_int{
     // 1 positive
     // 0 zero
     // -1 negative
-    static const int _bit = 4;
-    static const int _base = 10000;
-    static const int _visual_base = 10;
+    //static const int _bit = 4;
+    //static const int _read_dec_bit = 4;
+    static const int _bit = 16;
+    static const int _base = 65536;
+    //static const int _base = 10000;
+    static const int _visual_base = 10000;
+    static const int _visual_bit = 4;
     // return a pointer  if ok
     //  otherwise null
     //  str drop signs
@@ -41,7 +43,7 @@ class big_int{
     }
     void _set_zero(){
         _val.clear();
-        _val.push_back(0);
+        //_val.push_back(0);
         _positive = 0;
     }
 
@@ -49,9 +51,27 @@ class big_int{
         while(!_val.empty() && *(_val.rbegin()) == 0){
             _val.pop_back();
         }
-        if(_val.empty())_val.push_back(0);
+        if(_val.empty())_positive=0;
     }
   public:
+    template<typename Tin = int, typename Tout = int>
+    static std::vector<Tout> trans_base(const std::vector<Tin> &in, int base_in, int base_out){
+        std::vector<Tout> out;
+        for(auto pin = in.crbegin(); pin != in.crend(); ++pin){
+            int hi = *pin;
+            for(auto pout = out.begin(); pout != out.end(); ++pout){
+                int z = *pout * base_in + hi;
+                hi = z / base_out;
+                *pout = z % base_out;
+            }
+            while(hi){
+                out.push_back(hi % base_out);
+                hi /= base_out;
+            }
+        }
+        return out;
+    }
+
     explicit big_int():_positive(0){
         big_int(0); 
     }
@@ -79,6 +99,7 @@ class big_int{
     bool operator<=(const big_int& rhs)const;
     bool operator>=(const big_int& rhs)const;
 
+    ~big_int();
 };
 
 std::ostream& operator<< (std::ostream& os, const big_int& rhs);

@@ -3,11 +3,11 @@
 #include <cstring>
 #include <cctype>
 #include <iostream>
+#include <algorithm>
 
 #define VERIHY_DEBUG false
 
 namespace verihy{
-
 namespace math{
 
 
@@ -30,11 +30,11 @@ big_int::big_int(int val):_positive(0){
     _fix_pre_zeros();
 }
 
-big_int::big_int(big_int &&rhs)noexcept:_positive(rhs._positive),_val(rhs._val){
-#if VERIHY_DEBUG
-    std::cout << "move constructor of " << std::endl;
-#endif
-}
+//big_int::big_int(big_int &&rhs)noexcept:_positive(rhs._positive),_val(rhs._val){
+//#if VERIHY_DEBUG
+    //std::cout << "move constructor of " << std::endl;
+//#endif
+//}
 
 big_int::big_int(const big_int& rhs):_positive(rhs._positive),_val(rhs._val){
 #if VERIHY_DEBUG
@@ -50,38 +50,17 @@ big_int::big_int(const char* _str):_positive(0){
     std::cout << "char* constructor of " << _str << std::endl;
 #endif
     char* str = _pre_trans(_str, _positive);
-    bool zero = true;
-    if(str){
-        char* pstr = str + std::strlen(str) - 1;
-        int cnt = 0;
-        int tmp = 0;
-        while(pstr >= str){
-            if(_bit == cnt){
-                _val.push_back(tmp);
-                if(tmp)zero = false;
-                tmp = 0;
-                cnt = 0;
-            }
-            if(std::isdigit(*pstr)){
-                tmp += _ctoi(*pstr) * _weight(cnt);
-                --pstr;
-                ++cnt;
-            }else{
-                _set_zero();
-                return;
-            }
-        }
-        if(cnt){
-            _val.push_back(tmp);
-            if(tmp)zero = false;
-        }
-        if(zero){
+    std::vector<char> tmp;
+    for(char* pstr = str+std::strlen(str)-1; pstr>=str; --pstr){
+        char ch = *pstr; 
+        if(std::isdigit(ch)){
+            tmp.push_back(_ctoi(ch));
+        }else{
             _set_zero();
+            return ;
         }
-    }else{
-        _set_zero();
     }
-
+    _val = big_int::trans_base<char, int>(tmp, 10, _base);
     _fix_pre_zeros();
 }
 
@@ -110,20 +89,24 @@ char* big_int::_pre_trans(const char* _str, int& positive){
 
 
 std::ostream& operator<<(std::ostream& os, const big_int& rhs){
+    if(rhs._positive == 0){
+        os << "0";
+        return os;
+    }
+    auto out = big_int::trans_base(rhs._val, rhs._base, rhs._visual_base);
     if(rhs._positive < 0){
-        os<<"-";
+        os << "-";
     }
     bool is_first = true;
-    for(auto part = rhs._val.rbegin(); part != rhs._val.rend(); ++part){
+    for(auto part = out.crbegin(); part != out.crend(); ++part){
         if(!is_first){
-            os << std::setw(rhs._bit) <<  std::setfill('0') << *part;
-        //}else if(*part || part == rhs._val.rend()-1){
+            os << std::setw(rhs._visual_bit) <<  std::setfill('0') << *part;
         }else{
             os << *part;
             is_first = false;
         }
     }
-    
+
     return os;
 }
 
@@ -191,8 +174,37 @@ bool big_int::operator==(const big_int& rhs)const{
     return true;
 }
 
+big_int::~big_int(){
+#if VERIHY_DEBUG
+    std::cout << "==== " << *this << " ===" << std::endl;
+    std::cout << "destructor called" << std::endl;
+#endif
+}
 
-// add operator
+
+// operators
+
+big_int big_int::operator+(const big_int& rhs){
+    big_int ans = 0;
+    int carry = 0;
+    if(_positive == rhs._positive){
+        auto pl = _val.crbegin();
+        auto pr = rhs._val.crbegin();
+        while(pl!=_val.crend() && pr!=rhs._val.crend()){
+            int tmp = *pl + *pr + carry;
+            if(tmp >= _base){
+                carry = 1;
+            }
+        }
+        // regular add
+    }else{
+        // sub
+    }
+    return ans;
+}
+
+
+
 
 
 }// namespace math
