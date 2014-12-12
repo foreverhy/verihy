@@ -5,6 +5,7 @@
 #include <string>
 #include <iostream>
 #include <exception>
+#include <algorithm>
 
 namespace verihy{
 
@@ -20,11 +21,9 @@ class big_int{
     // 1 positive
     // 0 zero
     // -1 negative
-    //static const int _bit = 4;
-    //static const int _read_dec_bit = 4;
     static const int _bit = 16;
     static const int _base = 65536;
-    //static const int _base = 10000;
+    static const int _lowbits = 0xffff;
     static const int _visual_base = 10000;
     static const int _visual_bit = 4;
     // return a pointer  if ok
@@ -53,6 +52,14 @@ class big_int{
         }
         if(_val.empty())_positive=0;
     }
+
+    // pure add , with same sign
+    void add(const std::vector<int> &lhs, const std::vector<int> &rhs, std::vector<int> &ans);
+    // pure sub, abs() of lhs is greater than rhs
+    void sub(const std::vector<int> &lhs, const std::vector<int> &rhs, std::vector<int> &ans);
+
+    int abs_compare(const big_int &rhs)const;
+
   public:
     template<typename Tin = int, typename Tout = int>
     static std::vector<Tout> trans_base(const std::vector<Tin> &in, int base_in, int base_out){
@@ -100,6 +107,12 @@ class big_int{
     bool operator>=(const big_int& rhs)const;
 
     ~big_int();
+
+    void debug(){
+        std::cout << *this << ": ";
+        std::for_each(_val.begin(), _val.end(),[](const int x){std::cout << x << " ";});
+        std::cout << std::endl;
+    }
 };
 
 std::ostream& operator<< (std::ostream& os, const big_int& rhs);

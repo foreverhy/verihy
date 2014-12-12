@@ -4,6 +4,7 @@
 #include <cctype>
 #include <iostream>
 #include <algorithm>
+#include <cassert>
 
 #define VERIHY_DEBUG false
 
@@ -129,28 +130,8 @@ bool big_int::operator<(const big_int& rhs)const{
     }else if(!_positive){
         return false;
     }
-    auto lenl = _val.size(), lenr = rhs._val.size();
-    if(lenl != lenr){
-        if(_positive > 0){
-            return lenl < lenr;
-        }else{
-            return lenl > lenr;
-        }
-    }
-    for(auto pl = _val.crbegin(), pr = rhs._val.crbegin();
-            pl!=_val.crend(); ++pl, ++pr){
-        if(_positive > 0){
-            if(*pl < *pr){
-                return true;
-            }
-        }else{
-            if(*pl > *pr){
-                return true;
-            }
-        }
-    
-    }
-    return false;
+    int flag = abs_compare(rhs);
+    return _positive?flag<0:flag>0;
 }
 
 bool big_int::operator>(const big_int& rhs)const{
@@ -161,17 +142,8 @@ bool big_int::operator==(const big_int& rhs)const{
     if(_positive != rhs._positive){
         return false;
     }
-    auto lenl = _val.size(), lenr = rhs._val.size();
-    if(lenl != lenr){
-        return false;
-    }
-    for(auto pl = _val.crbegin(), pr = rhs._val.crbegin();
-            pl!=_val.crend(); ++pl, ++pr){
-        if(*pl != *pr){
-            return false;
-        }
-    }
-    return true;
+    int flag = abs_compare(rhs);
+    return flag == 0;
 }
 
 big_int::~big_int(){
@@ -186,24 +158,126 @@ big_int::~big_int(){
 
 big_int big_int::operator+(const big_int& rhs){
     big_int ans = 0;
-    int carry = 0;
-    if(_positive == rhs._positive){
-        auto pl = _val.crbegin();
-        auto pr = rhs._val.crbegin();
-        while(pl!=_val.crend() && pr!=rhs._val.crend()){
-            int tmp = *pl + *pr + carry;
-            if(tmp >= _base){
-                carry = 1;
-            }
+    if(_positive * rhs._positive >= 0){
+        if(_positive * rhs._positive == 0){
+            ans._positive = _positive + rhs._positive;
+        }else{
+            ans._positive = _positive;
         }
-        // regular add
+        add(_val, rhs._val, ans._val);
     }else{
-        // sub
+        int flag = abs_compare(rhs);
+        if(flag > 0){
+            sub(_val, rhs._val, ans._val);
+            ans._positive = _positive;
+        }else{
+            sub(rhs._val, _val, ans._val);
+            ans._positive = -_positive;
+        }
     }
+
+    ans._fix_pre_zeros();
     return ans;
 }
 
+big_int big_int::operator-(const big_int& rhs){
+    big_int ans = 0;
+    if(_positive * rhs._positive == 0){
+        ans._val = _positive?_val:rhs._val; 
+        ans._positive = _positive?_positive:rhs._positive;
+    }else if (_positive * rhs._positive > 0){
+        int flag = abs_compare(rhs);
+        if(flag > 0){
+            sub(_val, rhs._val, ans._val);
+            ans._positive = _positive;
+        }else{
+            sub(rhs._val, _val, ans._val);
+            ans._positive = -_positive;
+        }
+    }else{
+        add(_val, rhs._val, ans._val);
+        ans._positive = _positive;
+    }
+    ans._fix_pre_zeros();
+    return ans;
+}
 
+int big_int::abs_compare(const big_int &rhs)const{
+    auto lenl = _val.size(), lenr = rhs._val.size();
+    if(lenl != lenr){
+        return lenl>lenr?1:-1;
+    }
+    for(auto pl = _val.crbegin(), pr = rhs._val.crbegin();
+            pl!=_val.crend(); ++pl, ++pr){
+        if(*pl != *pr){
+            return *pl > *pr?1:-1;
+        }
+    }
+    return 0;
+}
+
+
+void big_int::add(const std::vector<int> &lhs, const std::vector<int> &rhs, std::vector<int> &ans){
+    ans.clear();
+    auto pl = lhs.begin();
+    auto pr = rhs.begin();
+    int carry = 0;
+    for(; pl!=lhs.end() && pr!=rhs.end(); ++pl, ++pr){
+        int tmp = (*pl + *pr) + carry;
+        ans.push_back(tmp & _lowbits);
+        if(tmp > _lowbits){
+            carry = 1;
+        }else{
+            carry = 0;
+        }
+    }
+    auto plr = pl, pend = lhs.end();
+    if(plr == pend){
+        plr = pr;
+        pend = rhs.end();
+    }
+    for(; plr != pend; ++plr){
+        int tmp = (*plr) + carry;
+        ans.push_back(tmp & _lowbits);
+        if(tmp > _lowbits){
+            carry = 1;
+        }else{
+            carry = 0;
+        }
+    }
+    if(carry){
+        ans.push_back(carry);
+    }
+     
+}
+
+//gurantee that lhs is greater than or equal to rhs
+void big_int::sub(const std::vector<int> &lhs, const std::vector<int> &rhs, std::vector<int> &ans){
+    ans.clear();
+    auto pl = lhs.begin();
+    auto pr = rhs.begin();
+    int borrow = 0;
+    for(; pl!=lhs.end() && pr!=rhs.end(); ++pl, ++pr){
+        int tmp = (*pl - *pr) - borrow;
+        if(tmp < 0){
+            tmp += _base;
+            borrow = 1;
+        }else{
+            borrow = 0;
+        }
+        ans.push_back(tmp);
+    }
+    for(; pl != lhs.end(); ++pl){
+        int tmp = (*pl) - borrow;
+        if(tmp < 0){
+            tmp += _base;
+            borrow = 1;
+        }else{
+            borrow = 0;
+        }
+        ans.push_back(tmp);
+    }
+}
 
 
 
