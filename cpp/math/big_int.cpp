@@ -11,6 +11,13 @@
 namespace verihy{
 namespace math{
 
+big_int::big_int(unsigned val):_positive(1){
+    while(val){
+        _val.push_back(val & _lowbits);
+        val >>= _bit;
+    }
+    _fix_pre_zeros();
+}
 
 big_int::big_int(int val):_positive(0){
     auto lval = static_cast<long long>(val);
@@ -31,25 +38,16 @@ big_int::big_int(int val):_positive(0){
     _fix_pre_zeros();
 }
 
-//big_int::big_int(big_int &&rhs)noexcept:_positive(rhs._positive),_val(rhs._val){
-//#if VERIHY_DEBUG
-    //std::cout << "move constructor of " << std::endl;
-//#endif
-//}
+big_int::big_int(big_int &&rhs)noexcept:_positive(rhs._positive),_val(rhs._val){}
+
 
 big_int::big_int(const big_int& rhs):_positive(rhs._positive),_val(rhs._val){
-#if VERIHY_DEBUG
-    std::cout << "copy constructor of " << rhs << std::endl;
-#endif
 }
 
 big_int::big_int(const std::string& str):big_int(str.c_str()){
 }
 
 big_int::big_int(const char* _str):_positive(0){
-#if VERIHY_DEBUG
-    std::cout << "char* constructor of " << _str << std::endl;
-#endif
     char* str = _pre_trans(_str, _positive);
     std::vector<char> tmp;
     for(char* pstr = str+std::strlen(str)-1; pstr>=str; --pstr){
@@ -112,9 +110,15 @@ std::ostream& operator<<(std::ostream& os, const big_int& rhs){
 }
 
 big_int& big_int::operator=(const big_int& rhs){
-#if VERIHY_DEBUG
-    std::cout << "copy-assignment of " << rhs << std::endl;
-#endif
+    if(&rhs == this){
+        return *this;
+    }
+    _positive = rhs._positive;
+    _val = rhs._val;
+    return *this;
+}
+
+big_int& big_int::operator=(big_int &&rhs)noexcept{
     if(&rhs == this){
         return *this;
     }
@@ -147,10 +151,6 @@ bool big_int::operator==(const big_int& rhs)const{
 }
 
 big_int::~big_int(){
-#if VERIHY_DEBUG
-    std::cout << "==== " << *this << " ===" << std::endl;
-    std::cout << "destructor called" << std::endl;
-#endif
 }
 
 
@@ -279,6 +279,120 @@ void big_int::sub(const std::vector<int> &lhs, const std::vector<int> &rhs, std:
     }
 }
 
+//TODO move extra operations, eg: add leading zeros, extra copy constructors
+big_int big_int::operator*(const big_int&rhs){
+    if(*this == 0|| rhs == 0){
+        return big_int(0);
+    }
+    auto max_len = std::max(_val.size(), rhs._val.size());
+    if(max_len == 1){
+        return big_int(static_cast<unsigned>(_val[0]) * static_cast<unsigned>(rhs._val[0]));
+    }
+
+    auto val = _val, rhs_val = rhs._val;
+    val.insert(val.end(), max_len - val.size(), 0);
+    rhs_val.insert(rhs_val.end(), max_len - rhs_val.size(), 0);
+    auto mid = max_len >> 1;
+    big_int x[2], y[2];
+    x[0]._val.insert(x[0]._val.end(), val.begin(), val.begin()+mid);
+    x[1]._val.insert(x[1]._val.end(), val.begin()+mid, val.end());
+    y[0]._val.insert(y[0]._val.end(), rhs_val.begin(), rhs_val.begin()+mid);
+    y[1]._val.insert(y[1]._val.end(), rhs_val.begin()+mid, rhs_val.end());
+    x[0]._positive = x[1]._positive = y[0]._positive = y[1]._positive = 1;
+    big_int z2 = x[1]*y[1];
+    big_int z1 = x[1]*y[0] + x[0]*y[1];
+    big_int ans = big_int(x[0]*y[0]);
+
+    if(ans._val.size() < mid){
+        ans._val.insert(ans._val.end(), mid-ans._val.size(), 0);
+    }
+
+    std::vector<int>::size_type pos_ans, pos_z;
+    int carry = 0;
+    for(pos_ans = mid, pos_z = 0; pos_ans < ans._val.size() && pos_z < z1._val.size(); ++pos_ans,++pos_z){
+        auto tmp = ans._val[pos_ans] + z1._val[pos_z] + carry;
+        ans._val[pos_ans] = tmp & _lowbits;
+        if(tmp > _lowbits){
+            carry = 1;
+        }else{
+            carry = 0;
+        }
+    }
+    if(pos_ans < ans._val.size()){
+        for(;pos_ans < ans._val.size(); ++pos_ans){
+            auto tmp = ans._val[pos_ans] + carry;
+            ans._val[pos_ans] = tmp & _lowbits;
+            if(tmp > _lowbits){
+                carry = 1;
+            }else{
+                carry = 0;
+            }
+        }
+    }else if(pos_z < z1._val.size()){
+        for(;pos_z < z1._val.size(); ++pos_z){
+            auto tmp = z1._val[pos_z] + carry;
+            ans._val.push_back(tmp & _lowbits);
+            if(tmp > _lowbits){
+                carry = 1;
+            }else{
+                carry = 0;
+            }
+        }
+    }
+    if(carry){
+        ans._val.push_back(carry);
+    }
+
+
+    //ans._val.insert(ans._val.end(), z1._val.begin(), z1._val.end());
+
+    if(ans._val.size() < (mid<<1) ){
+        ans._val.insert(ans._val.end(), (mid<<1)-ans._val.size(), 0);
+    }
+
+
+    carry = 0;
+    for(pos_ans = mid<<1, pos_z = 0; pos_ans < ans._val.size() && pos_z < z2._val.size(); ++pos_ans,++pos_z){
+        auto tmp = ans._val[pos_ans] + z2._val[pos_z] + carry;
+        ans._val[pos_ans] = tmp & _lowbits;
+        if(tmp > _lowbits){
+            carry = 1;
+        }else{
+            carry = 0;
+        }
+    }
+    if(pos_ans < ans._val.size()){
+        for(;pos_ans < ans._val.size(); ++pos_ans){
+            auto tmp = ans._val[pos_ans] + carry;
+            ans._val[pos_ans] = tmp & _lowbits;
+            if(tmp > _lowbits){
+                carry = 1;
+            }else{
+                carry = 0;
+            }
+        }
+    }else if(pos_z < z2._val.size()){
+        for(;pos_z < z2._val.size(); ++pos_z){
+            auto tmp = z2._val[pos_z] + carry;
+            ans._val.push_back(tmp & _lowbits);
+            if(tmp > _lowbits){
+                carry = 1;
+            }else{
+                carry = 0;
+            }
+        }
+    }
+    if(carry){
+        ans._val.push_back(carry);
+    }
+
+
+
+    //ans._val.insert(ans._val.end(), z2._val.begin(), z2._val.end());
+    ans._positive = _positive * rhs._positive;
+    ans._fix_pre_zeros();
+    return ans;
+}
 
 
 }// namespace math

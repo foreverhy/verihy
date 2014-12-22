@@ -12,8 +12,9 @@ namespace verihy{
 namespace math{
 
 
-//TODO
-// move +-*/ operator
+// TODO use unsigned 32/16 bit instead of int in vector _val
+// TODO make operator +-*/ friend functions, but +=/-=/*=//= class member.
+//  This is because we have 0 == big_int or 1 + big_int etc.
 class big_int{
   private:
     int _positive;
@@ -60,6 +61,8 @@ class big_int{
 
     int abs_compare(const big_int &rhs)const;
 
+    
+
   public:
     template<typename Tin = int, typename Tout = int>
     static std::vector<Tout> trans_base(const std::vector<Tin> &in, int base_in, int base_out){
@@ -79,14 +82,14 @@ class big_int{
         return out;
     }
 
-    explicit big_int():_positive(0){
-        big_int(0); 
-    }
+    big_int():big_int(0){}
+    big_int(unsigned val);
     big_int(int val);
     big_int(const char* str);
     big_int(const std::string &str);
     big_int(const big_int &bint);
     big_int(big_int &&rhs)noexcept;
+    big_int& operator= (big_int&& rhs)noexcept;
     big_int& operator= (const big_int& bint);
     big_int operator+ (const big_int& rhs);
     big_int operator- (const big_int& rhs);
