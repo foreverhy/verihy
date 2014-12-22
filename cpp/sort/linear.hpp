@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <cstring>
+#include <iterator>
 
 namespace verihy{
 
@@ -21,7 +22,7 @@ void radix_sort(RandomIt first, RandomIt last){
     const int offset = 4;
     int shift = 0;
     int count[digits];
-    std::vector<decltype(0 + *first)> tmp(last - first, 0);
+    std::vector<typename std::iterator_traits<RandomIt>::value_type> tmp(last - first, 0);
     while(true){
         std::memset(count, 0, sizeof count);
         bool done = true;
