@@ -11,12 +11,12 @@ namespace vstd{
 
 template<typename _T>
 class Vector{
+  public:
     typedef std::uint32_t size_type;
     typedef _T value_type;
     typedef std::allocator<_T> alloc_type;
     typedef _T& reference;
     typedef _T* pointer;
-  public:
     class iterator;
   private:
     pointer _data;
