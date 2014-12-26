@@ -21,7 +21,7 @@ class Vector{
     pointer _data;
     size_type _size;
     size_type _capacity;
-    alloc_type _alloc;
+    alloc_type  _alloc;
     static const size_type _growsize = 24;
 
     void grow(){
@@ -29,7 +29,10 @@ class Vector{
         //TODO if capacity > UINT32_MAX, throw exception
         if(_size){
             for(size_type i = 0; i < _size; ++i){
-                _alloc.construct(ptr + i, *(_data + i));
+                //TODO template specialized for int,char....
+                // we don't need destructor for these build-in types
+                //  also don't need move constructor
+                _alloc.construct(ptr + i, std::move(*(_data +i)));
                 _alloc.destroy(_data + i);
             }
             _alloc.deallocate(_data, _capacity);
@@ -40,7 +43,7 @@ class Vector{
 
   public:
 
-    Vector():_data(nullptr), _size(0), _capacity(0){}
+    Vector():_data(nullptr), _size(0), _capacity(0){};
     ~Vector(){
         for(size_type i = 0; i < _size; ++i){
             _alloc.destroy(_data + i);
@@ -74,6 +77,10 @@ class Vector{
 
     reference operator[](size_type offset){
         return *(_data + offset);
+    }
+
+    size_type size(){
+        return _size;
     }
 
 
