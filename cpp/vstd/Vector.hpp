@@ -16,12 +16,13 @@ class Vector{
     typedef std::allocator<_T> alloc_type;
     typedef _T& reference;
     typedef _T* pointer;
+    typedef Vector<_T> self_type;
     class iterator;
   private:
     pointer _data;
     size_type _size;
     size_type _capacity;
-    alloc_type  _alloc;
+    static alloc_type _alloc;
     static const size_type _growsize = 24;
 
     void grow(){
@@ -44,6 +45,7 @@ class Vector{
   public:
 
     Vector():_data(nullptr), _size(0), _capacity(0){};
+    Vector(std::initializer_list<value_type>);
     ~Vector(){
         for(size_type i = 0; i < _size; ++i){
             _alloc.destroy(_data + i);
@@ -51,13 +53,19 @@ class Vector{
         _alloc.deallocate(_data, _capacity);
     }
 
-    //Vector(const Vector &rhs){
+    Vector(const Vector &rhs):_size(rhs._size), _capacity(rhs._size){
+        auto ptr = _alloc.allocate(_capacity);
+        _data = ptr;
+        auto prhs = rhs._data;
+        for(size_type i = 0; i < _size; ++i){
+            _alloc.construct(ptr++, *(prhs++));
+        }
+    }
 
-    //}
-
-    //Vector(Vector &&rhs){
-
-    //}
+    Vector(Vector &&rhs):_data(rhs._data), _size(rhs._size), _capacity(rhs._capacity){
+        rhs._data = nullptr; 
+        rhs._size = rhs._capacity = 0;
+    }
 
     void push_back(const value_type &x){
         if(_size == _capacity){
@@ -81,6 +89,40 @@ class Vector{
 
     size_type size(){
         return _size;
+    }
+
+    self_type& operator=(const self_type &rhs){
+        if(&rhs == this){
+            return *this;
+        }
+        auto ptr = _data;
+        for(size_type i = 0; i < _size; ++i){
+            _alloc.destroy(ptr++);
+        }
+        _alloc.deallocate(_data, _size);
+
+        _size = rhs._size;
+        _capacity = _size;
+
+        ptr = _alloc.allocate(_capacity);
+        _data = ptr;
+        auto prhs = rhs._data;
+        for(size_type i = 0; i < _size; ++i){
+            _alloc.construct(ptr++, *(prhs++));
+        }
+        return *this;
+    }
+
+    self_type& operator=(self_type &&rhs){
+        if(&rhs == this){
+            return *this;
+        }
+        _data = rhs._data;
+        _size = rhs._size;
+        _capacity = rhs._capacity;
+        rhs._data = nullptr;
+        rhs._size = rhs._capacity = 0;
+        return *this;
     }
 
 
@@ -121,7 +163,7 @@ class Vector{
             return *this;
         }
 
-        iterator operator++(int x){
+        iterator operator++(int ){
             auto ptr = _ptr;
             ++_ptr; 
             return iterator(ptr);
@@ -132,7 +174,7 @@ class Vector{
             return *this;
         }
 
-        iterator operator--(int x){
+        iterator operator--(int ){
             auto ptr = _ptr;
             --_ptr;
             return iterator(ptr);
@@ -193,7 +235,8 @@ class Vector{
 
 };//class Vector
 
-
+template<typename _T>
+typename Vector<_T>::alloc_type Vector<_T>::_alloc;
 
 }
     
