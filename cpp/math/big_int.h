@@ -12,46 +12,46 @@ namespace verihy{
 namespace math{
 
 
-// TODO use unsigned 32/16 bit instead of int in vector _val
+// TODO use unsigned 32/16 bit instead of int in vector val_
 // TODO make operator +-*/ friend functions, but +=/-=/*=//= class member.
 //  This is because we have 0 == big_int or 1 + big_int etc.
 class big_int{
   private:
-    int _positive;
-    std::vector<int> _val;
+    int positive_;
+    std::vector<int> val_;
     // 1 positive
     // 0 zero
     // -1 negative
-    static const int _bit = 16;
-    static const int _base = 65536;
-    static const int _lowbits = 0xffff;
-    static const int _visual_base = 10000;
-    static const int _visual_bit = 4;
+    static const int bit_ = 16;
+    static const int base_ = 65536;
+    static const int lowbits_ = 0xffff;
+    static const int visual_base_ = 10000;
+    static const int visual_bit_ = 4;
     // return a pointer  if ok
     //  otherwise null
     //  str drop signs
-    static char* _pre_trans(const char* str, int& positive);
-    int _ctoi(char ch){
+    static char* pre_trans_(const char* str, int& positive);
+    int ctoi_(char ch){
         return ch - '0';
     }
-    int _weight(int order){
+    int weight_(int order){
         int tmp = 1;
         for(int i = 0; i < order; ++i){
-            tmp *= _visual_base;
+            tmp *= visual_base_;
         }
         return tmp;
     }
-    void _set_zero(){
-        _val.clear();
-        //_val.push_back(0);
-        _positive = 0;
+    void set_zero_(){
+        val_.clear();
+        //val_.push_back(0);
+        positive_ = 0;
     }
 
-    void _fix_pre_zeros(){
-        while(!_val.empty() && *(_val.rbegin()) == 0){
-            _val.pop_back();
+    void fix_pre_zeros_(){
+        while(!val_.empty() && *(val_.rbegin()) == 0){
+            val_.pop_back();
         }
-        if(_val.empty())_positive=0;
+        if(val_.empty())positive_=0;
     }
 
     // pure add , with same sign
@@ -113,7 +113,7 @@ class big_int{
 
     void debug(){
         std::cout << *this << ": ";
-        std::for_each(_val.begin(), _val.end(),[](const int x){std::cout << x << " ";});
+        std::for_each(val_.begin(), val_.end(),[](const int x){std::cout << x << " ";});
         std::cout << std::endl;
     }
 };

@@ -8,107 +8,107 @@ namespace verihy{
 
 namespace vstd{
 
-template<typename _T>
+template<typename T_>
 class Vector{
   public:
     typedef std::uint32_t size_type;
-    typedef _T value_type;
-    typedef std::allocator<_T> alloc_type;
-    typedef _T& reference;
-    typedef _T* pointer;
-    typedef Vector<_T> self_type;
+    typedef T_ value_type;
+    typedef std::allocator<T_> alloc_type;
+    typedef T_& reference;
+    typedef T_* pointer;
+    typedef Vector<T_> self_type;
     class iterator;
   private:
-    pointer _data;
-    size_type _size;
-    size_type _capacity;
-    static alloc_type _alloc;
-    static const size_type _growsize = 24;
+    pointer data_;
+    size_type size_;
+    size_type capacity_;
+    static alloc_type alloc_;
+    static const size_type growsize_ = 24;
 
     void grow(){
-        auto ptr = _alloc.allocate(_capacity + _growsize);
+        auto ptr = alloc_.allocate(capacity_ + growsize_);
         //TODO if capacity > UINT32_MAX, throw exception
-        if(_size){
-            for(size_type i = 0; i < _size; ++i){
+        if(size_){
+            for(size_type i = 0; i < size_; ++i){
                 //TODO template specialized for int,char....
                 // we don't need destructor for these build-in types
                 //  also don't need move constructor
-                _alloc.construct(ptr + i, std::move(*(_data +i)));
-                _alloc.destroy(_data + i);
+                alloc_.construct(ptr + i, std::move(*(data_ +i)));
+                alloc_.destroy(data_ + i);
             }
-            _alloc.deallocate(_data, _capacity);
+            alloc_.deallocate(data_, capacity_);
         }
-        _capacity += _growsize;
-        _data = ptr;
+        capacity_ += growsize_;
+        data_ = ptr;
     }
 
   public:
 
-    Vector():_data(nullptr), _size(0), _capacity(0){};
+    Vector():data_(nullptr), size_(0), capacity_(0){};
     Vector(std::initializer_list<value_type>);
     ~Vector(){
-        for(size_type i = 0; i < _size; ++i){
-            _alloc.destroy(_data + i);
+        for(size_type i = 0; i < size_; ++i){
+            alloc_.destroy(data_ + i);
         }
-        _alloc.deallocate(_data, _capacity);
+        alloc_.deallocate(data_, capacity_);
     }
 
-    Vector(const Vector &rhs):_size(rhs._size), _capacity(rhs._size){
-        auto ptr = _alloc.allocate(_capacity);
-        _data = ptr;
-        auto prhs = rhs._data;
-        for(size_type i = 0; i < _size; ++i){
-            _alloc.construct(ptr++, *(prhs++));
+    Vector(const Vector &rhs):size_(rhs.size_), capacity_(rhs.size_){
+        auto ptr = alloc_.allocate(capacity_);
+        data_ = ptr;
+        auto prhs = rhs.data_;
+        for(size_type i = 0; i < size_; ++i){
+            alloc_.construct(ptr++, *(prhs++));
         }
     }
 
-    Vector(Vector &&rhs):_data(rhs._data), _size(rhs._size), _capacity(rhs._capacity){
-        rhs._data = nullptr; 
-        rhs._size = rhs._capacity = 0;
+    Vector(Vector &&rhs):data_(rhs.data_), size_(rhs.size_), capacity_(rhs.capacity_){
+        rhs.data_ = nullptr; 
+        rhs.size_ = rhs.capacity_ = 0;
     }
 
     void push_back(const value_type &x){
-        if(_size == _capacity){
+        if(size_ == capacity_){
             grow();
         }
-        _alloc.construct(_data + _size, x);
-        ++_size;
+        alloc_.construct(data_ + size_, x);
+        ++size_;
     }
 
     void push_back(value_type &&x){
-        if(_size == _capacity){
+        if(size_ == capacity_){
             grow();
         }
-        _alloc.construct(_data + _size, std::move(x));
-        ++_size;
+        alloc_.construct(data_ + size_, std::move(x));
+        ++size_;
     }
 
     reference operator[](size_type offset){
-        return *(_data + offset);
+        return *(data_ + offset);
     }
 
     size_type size(){
-        return _size;
+        return size_;
     }
 
     self_type& operator=(const self_type &rhs){
         if(&rhs == this){
             return *this;
         }
-        auto ptr = _data;
-        for(size_type i = 0; i < _size; ++i){
-            _alloc.destroy(ptr++);
+        auto ptr = data_;
+        for(size_type i = 0; i < size_; ++i){
+            alloc_.destroy(ptr++);
         }
-        _alloc.deallocate(_data, _size);
+        alloc_.deallocate(data_, size_);
 
-        _size = rhs._size;
-        _capacity = _size;
+        size_ = rhs.size_;
+        capacity_ = size_;
 
-        ptr = _alloc.allocate(_capacity);
-        _data = ptr;
-        auto prhs = rhs._data;
-        for(size_type i = 0; i < _size; ++i){
-            _alloc.construct(ptr++, *(prhs++));
+        ptr = alloc_.allocate(capacity_);
+        data_ = ptr;
+        auto prhs = rhs.data_;
+        for(size_type i = 0; i < size_; ++i){
+            alloc_.construct(ptr++, *(prhs++));
         }
         return *this;
     }
@@ -117,101 +117,101 @@ class Vector{
         if(&rhs == this){
             return *this;
         }
-        _data = rhs._data;
-        _size = rhs._size;
-        _capacity = rhs._capacity;
-        rhs._data = nullptr;
-        rhs._size = rhs._capacity = 0;
+        data_ = rhs.data_;
+        size_ = rhs.size_;
+        capacity_ = rhs.capacity_;
+        rhs.data_ = nullptr;
+        rhs.size_ = rhs.capacity_ = 0;
         return *this;
     }
 
 
     //iterators
     iterator begin(){
-        return iterator(_data);
+        return iterator(data_);
     }
 
     iterator end(){
-        return iterator(_data + _size);
+        return iterator(data_ + size_);
     }
 
 
     class iterator{
       public:
         typedef std::uint32_t size_type;
-        typedef _T value_type;
-        typedef _T* pointer;
-        typedef _T& reference;
+        typedef T_ value_type;
+        typedef T_* pointer;
+        typedef T_& reference;
         typedef std::random_access_iterator_tag iterator_category;
         typedef std::int32_t difference_type;
       private:
-        pointer _ptr;
+        pointer ptr_;
       public:
-        iterator(pointer ptr):_ptr(ptr){}
-        iterator():_ptr(nullptr){}
-        iterator(const iterator &rhs):_ptr(rhs._ptr){ }
+        iterator(pointer ptr):ptr_(ptr){}
+        iterator():ptr_(nullptr){}
+        iterator(const iterator &rhs):ptr_(rhs.ptr_){ }
 
         reference operator*(){
-            return *_ptr;
+            return *ptr_;
         }
         pointer operator->(){
-            return _ptr;
+            return ptr_;
         }
 
         iterator& operator++(){
-            ++_ptr;
+            ++ptr_;
             return *this;
         }
 
         iterator operator++(int ){
-            auto ptr = _ptr;
-            ++_ptr; 
+            auto ptr = ptr_;
+            ++ptr_; 
             return iterator(ptr);
         }
 
         iterator& operator--(){
-            --_ptr;
+            --ptr_;
             return *this;
         }
 
         iterator operator--(int ){
-            auto ptr = _ptr;
-            --_ptr;
+            auto ptr = ptr_;
+            --ptr_;
             return iterator(ptr);
         }
 
         iterator& operator=(const iterator &rhs){
-            _ptr = rhs._ptr;
+            ptr_ = rhs.ptr_;
             return *this;
         }
 
         iterator& operator+=(const size_type &rhs){
-            _ptr += rhs;
+            ptr_ += rhs;
             return *this;
         }
 
         iterator& operator-=(const size_type &rhs){
-            _ptr -= rhs;
+            ptr_ -= rhs;
             return *this;
         }
 
         bool operator<(const iterator &rhs){
-            return _ptr < rhs._ptr;
+            return ptr_ < rhs.ptr_;
         }
         bool operator>(const iterator &rhs){
-            return _ptr > rhs._ptr;
+            return ptr_ > rhs.ptr_;
         }
         bool operator==(const iterator &rhs){
-            return _ptr == rhs._ptr;
+            return ptr_ == rhs.ptr_;
         }
         bool operator!=(const iterator &rhs){
-            return _ptr != rhs._ptr;
+            return ptr_ != rhs.ptr_;
         }
         bool operator<=(const iterator &rhs){
-            return _ptr <= rhs._ptr;
+            return ptr_ <= rhs.ptr_;
         }
         bool operator>=(const iterator &rhs){
-            return _ptr >= rhs._ptr;
+            return ptr_ >= rhs.ptr_;
         }
 
         iterator operator+(const size_type &rhs){
@@ -227,7 +227,7 @@ class Vector{
         }
 
         difference_type operator-(const iterator &rhs){
-            return _ptr - rhs._ptr;
+            return ptr_ - rhs.ptr_;
         }
 
     };// class Vector::iterator
@@ -235,8 +235,8 @@ class Vector{
 
 };//class Vector
 
-template<typename _T>
-typename Vector<_T>::alloc_type Vector<_T>::_alloc;
+template<typename T_>
+typename Vector<T_>::alloc_type Vector<T_>::alloc_;
 
 }
     
