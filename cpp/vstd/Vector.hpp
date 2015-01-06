@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <cstring>
 
 namespace verihy{
 
