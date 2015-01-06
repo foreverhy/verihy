@@ -238,6 +238,18 @@ class Vector{
 template<typename T_>
 typename Vector<T_>::alloc_type Vector<T_>::alloc_;
 
+
+template<>
+void Vector<int>::grow(){
+    auto ptr = alloc_.allocate(capacity_ + growsize_);
+    //TODO if capacity > UINT32_MAX, throw exception
+    if(size_){
+        std::uninitialized_copy_n(iterator(data_), size_, iterator(ptr));
+    }
+    capacity_ += growsize_;
+    data_ = ptr;
+}// Vector<int>::grow()
+
 }
     
 }
