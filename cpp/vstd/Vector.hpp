@@ -13,7 +13,7 @@ class Vector{
   public:
     typedef std::uint32_t size_type;
     typedef T_ value_type;
-    typedef std::allocator<T_> alloc_type;
+    typedef std::allocator<T_> allocator_type;
     typedef T_& reference;
     typedef T_* pointer;
     typedef Vector<T_> self_type;
@@ -22,7 +22,7 @@ class Vector{
     pointer data_;
     size_type size_;
     size_type capacity_;
-    static alloc_type alloc_;
+    static allocator_type alloc_;
     static const size_type growsize_ = 24;
 
     void grow(){
@@ -236,7 +236,7 @@ class Vector{
 };//class Vector
 
 template<typename T_>
-typename Vector<T_>::alloc_type Vector<T_>::alloc_;
+typename Vector<T_>::allocator_type Vector<T_>::alloc_;
 
 
 template<>
