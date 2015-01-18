@@ -8,6 +8,7 @@ namespace verihy{
 
 namespace vstd{
 
+//TODO thread safety
 template<typename T_>
 class Vector{
   public:
@@ -24,6 +25,7 @@ class Vector{
     size_type capacity_;
     static allocator_type alloc_;
     static const size_type growsize_ = 24;
+
 
     void grow(){
         auto ptr = alloc_.allocate(capacity_ + growsize_);
@@ -91,6 +93,10 @@ class Vector{
         return size_;
     }
 
+    size_type capacity(){
+        return capacity_;
+    }
+
     self_type& operator=(const self_type &rhs){
         if(&rhs == this){
             return *this;
@@ -146,6 +152,72 @@ class Vector{
             *q = t;
         }
     }
+
+    // Modifier
+
+    void clear(){
+        for(size_type i = 0; i < size_; ++i){
+            //TODO template specialized for int,char....
+            // we don't need destructor for these build-in types
+            alloc_.destroy(data_ + i);
+        }
+        size_ = 0;
+    }
+    
+    iterator insert(iterator pos, const T_& value){
+        push_back(value);
+        for(auto p = end() - 1; p > pos; --p){
+            *p = *(p - 1);
+        }
+        *pos = value;
+        return pos;
+    }
+
+    iterator insert(iterator pos, const T_&& value){
+        push_back(std::move(value));
+        auto tmp = std::move(*(end()-1));
+        for(auto p = end() - 1; p > pos; --p){
+            *p = *(p - 1);
+        }
+        *pos = std::move(tmp);
+        return pos;
+    }
+
+    iterator erase(iterator pos){
+        if(!empty()){
+            for(auto p = pos; p < end() - 1; ++p){
+                *p = *(p + 1);
+            }
+            alloc_.destroy(data_ + size_ - 1);
+            --size_;
+        }
+        return pos;
+    }
+
+    void pop_back(){
+        if(!empty()){
+            alloc_.destroy(data_ + size_ - 1);
+            --size_;
+        }
+    }
+
+    void shrink_to_fit(){
+        if(empty()){
+            return;
+        }
+        auto ptr = alloc_.allocate(size_);
+        for(size_type i = 0; i < size_; ++i){
+            alloc_.construct(ptr + i, std::move(*(data_ +i)));
+            alloc_.destroy(data_ + i);
+        }
+        alloc_.deallocate(data_, capacity_);
+        capacity_ = size_;
+        data_ = ptr;
+
+    }
+    
+
+
 
 
     class iterator{
