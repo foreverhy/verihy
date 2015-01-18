@@ -193,6 +193,7 @@ class Vector{
         }
         return pos;
     }
+<<<<<<< HEAD
 
     void pop_back(){
         if(!empty()){
@@ -215,6 +216,8 @@ class Vector{
         data_ = ptr;
 
     }
+=======
+>>>>>>> origin/master
     
 
 
