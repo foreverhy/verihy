@@ -135,6 +135,18 @@ class Vector{
         return iterator(data_ + size_);
     }
 
+    bool empty(){
+        return 0 == size_;
+    }
+    
+    void reverse(){
+        for(auto p = begin(), q = end() - 1; p < q; ++p, --q){
+            auto t = *p;
+            *p = *q;
+            *q = t;
+        }
+    }
+
 
     class iterator{
       public:
