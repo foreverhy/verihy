@@ -216,8 +216,6 @@ class Vector{
         data_ = ptr;
 
     }
-=======
->>>>>>> origin/master
     
 
 
