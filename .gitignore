@@ -11,7 +11,7 @@ main
 main.cpp
 *.swp
 lib/
-test*
+#test*
 # Created by https://www.gitignore.io
 
 ### C++ ###

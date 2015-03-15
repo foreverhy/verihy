@@ -193,7 +193,6 @@ class Vector{
         }
         return pos;
     }
-<<<<<<< HEAD
 
     void pop_back(){
         if(!empty()){

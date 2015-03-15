@@ -17,13 +17,13 @@
 GTEST_DIR = /home/mactavish/hdd/mactavish/program/gtest-1.7.0
 
 # Where to find user code.
-USER_DIR = ..
+USER_DIR = ../..
 
 # Where to find test code.
 TEST_DIR = .
 
 # Where to link my shared lib
-LINK_DIR = ../../lib
+LINK_DIR = ../../../lib
 LINK_DIR = /home/mactavish/workspace/verihy/lib
 LINKFLAGS = -L$(LINK_DIR) -ltrie_tree -L$(LINK_DIR) -lgraph -L$(LINK_DIR) -lmath
 
@@ -36,11 +36,11 @@ CPPFLAGS += -isystem $(GTEST_DIR)/include
 CXX = clang++
 
 # Flags passed to the C++ compiler.
-CXXFLAGS += -g -Wall -Wextra -pthread -std=c++0x 
+CXXFLAGS += -g -Wall -Wextra -pthread -std=c++11
 
 # All tests produced by this Makefile.  Remember to add new tests you
 # created to the list.
-TESTS = data_structure_unittest graph_unittest
+TESTS = vector_unittest
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -52,7 +52,7 @@ GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
 all : $(TESTS)
 
 clean :
-	rm -f $(TESTS) gtest.a gtest_main.a *.o $(LINK_DIR)/*.so $(LINK_DIR)/*.a
+	rm -f $(TESTS) gtest.a gtest_main.a *.o 
 
 
 # Builds gtest.a and gtest_main.a.
@@ -83,39 +83,16 @@ gtest_main.a : gtest-all.o gtest_main.o
 # gtest_main.a, depending on whether it defines its own main()
 # function.
 
+vector_unittest:vector_unittest.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS)  -lpthread $^ -o $@ 
 
 
-data_structure_unittest.o : $(TEST_DIR)/data_structure_unittest.cpp \
-							$(USER_DIR)/data_structure.hpp $(GTEST_HEADERS) \
-							$(USER_DIR)/data_structure/*.hpp \
-							$(USER_DIR)/data_structure/*.cpp \
-							$(USER_DIR)/data_structure/*.h \
-							trie_tree.so
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS)  -c $(TEST_DIR)/data_structure_unittest.cpp $(LINKFLAGS)
+vector_unittest.o:$(TEST_DIR)/vector_unittest.cpp $(USER_DIR)/vstd/Vector.hpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS)  -c $(TEST_DIR)/vector_unittest.cpp
 
-data_structure_unittest :  data_structure_unittest.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS)  -lpthread $^ -o $@ $(LINKFLAGS)
+string_unittest:string_unittest.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS)  -lpthread $^ -o $@ 
 
-trie_tree.so :$(USER_DIR)/data_structure.hpp $(USER_DIR)/data_structure/trie_tree.*
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(USER_DIR)/data_structure/trie_tree.cpp -fPIC -shared -o $(LINK_DIR)/libtrie_tree.so
+string_unittest.o:$(TEST_DIR)/string_unittest.cpp $(USER_DIR)/vstd/String.hpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS)  -c $(TEST_DIR)/string_unittest.cpp
 
-graph_unittest:graph_unittest.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS)  -lpthread $^ -o $@ $(LINKFLAGS)
-
-graph_unittest.o: $(TEST_DIR)/graph_unittest.cpp $(USER_DIR)/graph.h $(GTEST_HEADERS) $(USER_DIR)/graph/*.h \
-	$(USER_DIR)/graph/*.cpp libgraph.so
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS)  -c $(TEST_DIR)/graph_unittest.cpp $(LINKFLAGS)
-
-math_unittest:math_unittest.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS)  -lpthread $^ -o $@ $(LINKFLAGS)
-
-math_unittest.o: $(TEST_DIR)/math_unittest.cpp $(USER_DIR)/math.h $(GTEST_HEADERS) $(USER_DIR)/math/*.h \
-	$(USER_DIR)/math/*.cpp libmath.so
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS)  -c $(TEST_DIR)/math_unittest.cpp $(LINKFLAGS)
-					
-
-libgraph.so:$(USER_DIR)/graph.h $(USER_DIR)/graph/graph*.h $(USER_DIR)/graph/graph*.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(USER_DIR)/graph/graph*.cpp -fPIC --shared -o $(LINK_DIR)/libgraph.so
-
-libmath.so:$(USER_DIR)/math.h $(USER_DIR)/math/*.h $(USER_DIR)/math/*.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(USER_DIR)/math/*.cpp -fPIC --shared -o $(LINK_DIR)/libmath.so
