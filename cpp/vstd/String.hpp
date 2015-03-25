@@ -39,16 +39,20 @@ class String{
         delete[] data_;
     }
 
+    void swap(String &rhs){
+        if (&rhs == this){
+            return;
+        }
+        std::swap(data_, rhs.data_);
+        std::swap(size_, rhs.size_);
+    }
+
     String& operator=(const String &rhs){
         if(this == &rhs){
             return *this;
         }
-        if(size_ < rhs.size()){
-            delete[] data_;
-            data_ = new char[rhs.size() + 1];
-            size_ = rhs.size();
-        }
-        std::memcpy(data_, rhs.data(), size_);
+        String tmp(rhs);
+        swap(tmp);
         return *this;
     }
 

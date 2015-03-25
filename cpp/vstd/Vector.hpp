@@ -97,25 +97,23 @@ class Vector{
         return capacity_;
     }
 
+    void swap(self_type &rhs){
+        if (&rhs == this){
+            return;
+        }
+
+        std::swap(data_, rhs.data_);
+        std::swap(size_, rhs.size_);
+        std::swap(capacity_, rhs.capacity_);
+
+    }
+
     self_type& operator=(const self_type &rhs){
         if(&rhs == this){
             return *this;
         }
-        auto ptr = data_;
-        for(size_type i = 0; i < size_; ++i){
-            alloc_.destroy(ptr++);
-        }
-        alloc_.deallocate(data_, size_);
-
-        size_ = rhs.size_;
-        capacity_ = size_;
-
-        ptr = alloc_.allocate(capacity_);
-        data_ = ptr;
-        auto prhs = rhs.data_;
-        for(size_type i = 0; i < size_; ++i){
-            alloc_.construct(ptr++, *(prhs++));
-        }
+        self_type tmp(rhs);
+        swap(tmp);
         return *this;
     }
 
@@ -126,6 +124,7 @@ class Vector{
         data_ = rhs.data_;
         size_ = rhs.size_;
         capacity_ = rhs.capacity_;
+
         rhs.data_ = nullptr;
         rhs.size_ = rhs.capacity_ = 0;
         return *this;
