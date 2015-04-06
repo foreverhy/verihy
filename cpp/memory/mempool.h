@@ -2,6 +2,7 @@
 #define VERIHY_MEMPOOL_H 
 #include <cstdint>
 #include <iostream>
+#include <mutex>
 
 namespace verihy{
 
@@ -18,6 +19,7 @@ class mem_pool{
   public:
     mem_block *head_;
     std::size_t totalsz;
+    std::mutex mtx;
     static const std::size_t EXTRASPACE = sizeof(struct mem_block);
     static const std::size_t MAXSIZE = 1024 * 1024 * 20;
   public:
