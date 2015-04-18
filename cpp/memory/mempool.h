@@ -1,38 +1,55 @@
-#ifndef VERIHY_MEMPOOL_H
-#define VERIHY_MEMPOOL_H 
-#include <cstdint>
-#include <iostream>
-#include <mutex>
+//
+// Created by mactavish on 15-4-16.
+//
+
+#ifndef MEMPOOL_MEMPOOL_H
+#define MEMPOOL_MEMPOOL_H
+
 
 namespace verihy{
 
-
-struct mem_block{
-    mem_block *prev;
-    mem_block *next;
+struct mem_chunk{
+    mem_chunk *prev;
+    mem_chunk *next;
     uint32_t size;
-    uint32_t magic;
-    int end[0];
 };
+
+class mem_list{
+  public:
+    static const int extra_size = 3 * sizeof(void *);
+    mem_list *next;
+    mem_chunk *available;
+    mem_chunk *used;
+
+    void free_chunklist(mem_chunk *chunk);
+
+    uint32_t size;
+
+    explicit mem_list(const uint32_t sz):
+            next(nullptr), available(nullptr),
+            used(nullptr), size(sz){}
+    ~mem_list();
+
+    void* get();
+    void put(mem_chunk *chunk);
+
+};
+
 
 class mem_pool{
+  private:
+    mem_list *mlist;
   public:
-    mem_block *head_;
-    std::size_t totalsz;
-    std::mutex mtx;
-    static const std::size_t EXTRASPACE = sizeof(struct mem_block);
-    static const std::size_t MAXSIZE = 1024 * 1024 * 20;
-  public:
-    mem_pool():head_(nullptr), totalsz(0){}
+    mem_pool():mlist(nullptr){}
     ~mem_pool();
+    mem_pool(const mem_pool &rhs) = delete;
+    mem_pool(mem_pool &&rhs) = delete;
 
-    void* alloc(std::size_t sz);
-    int dealloc(void *addr);
+    void* alloc(uint32_t size);
+    void dealloc(void *addr);
 
 };
 
+} // namespace verihy
 
-} // namespace
-
-
-#endif
+#endif //MEMPOOL_MEMPOOL_H

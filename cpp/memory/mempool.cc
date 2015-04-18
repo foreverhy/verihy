@@ -1,59 +1,104 @@
+//
+// Created by mactavish on 15-4-16.
+//
+
+#include <stdint-gcc.h>
 #include "mempool.h"
-#include <cstdlib>
 
+namespace verihy {
 
-//TODO CAS lock free
+void* mem_list::get() {
+    mem_chunk *chunk = nullptr;
+    if (available){
+        chunk = available;
+        if (available->next){
+            available->next->prev = nullptr;
+        }
+        available = available->next;
 
-namespace verihy{
+    } else{
+        chunk = reinterpret_cast<mem_chunk*>(new unsigned char[size + extra_size]);
+        chunk->size = size;
+    }
 
-mem_pool::~mem_pool(){
-    for (auto p = head_; p;){
-        auto tmp = p;
-        p = p->next;
-        free(tmp);
+    if (used){
+        used->prev = chunk;
+    }
+
+    chunk->next = used;
+    chunk->prev = nullptr;
+    used = chunk;
+
+    return chunk + sizeof(chunk);
+}
+
+void mem_list::put(mem_chunk *chunk) {
+    if (chunk){
+        auto prev = chunk->prev;
+        auto nxt = chunk->next;
+
+        if (nxt){
+            nxt->prev = chunk->prev;
+        }
+
+        if (prev){
+            prev->next = chunk->next;
+        } else {
+            used = chunk->next;
+        }
+
+        if (available){
+            available->prev = chunk;
+        }
+        chunk->next = available;
+        available = chunk;
     }
 }
 
-void* mem_pool::alloc(size_t sz){
-    mtx.lock();
-    if (totalsz + sz > MAXSIZE){
-        mtx.unlock();
-        return nullptr;
+void mem_list::free_chunklist(mem_chunk *chunk) {
+    while (chunk){
+        auto tmp = chunk->next;
+        delete[] chunk;
+        chunk = tmp;
     }
-    totalsz += sz;
-    for(auto p = head_ ; p; p = p->next){
-        if (p->size >= sz){
-            if (p->next){
-                p->next->prev = p->prev;
-            }
-            if (p->prev){
-                p->prev->next = p->next;
-            }else{
-                head_ = p->next;
-            }
-            p->next = p->prev = nullptr;
-            mtx.unlock();
-            return p + sizeof(struct mem_block);
+}
+
+mem_list::~mem_list(){
+    free_chunklist(available);
+    free_chunklist(used);
+}
+
+mem_pool::~mem_pool() {
+    for (auto ml = mlist; ml; ){
+        auto tmp = ml->next;
+        delete ml;
+        ml = tmp;
+    }
+}
+
+
+void* mem_pool::alloc(uint32_t size) {
+    auto ml = mlist;
+    for ( ; ml && ml->size != size; ml = ml->next);
+    if (!ml){
+        ml = new mem_list(size);
+    }
+    return ml->get();
+}
+
+void mem_pool::dealloc(void *addr) {
+    auto chunk = reinterpret_cast<mem_chunk*>(addr);
+    chunk -= 2;
+
+    for (auto ml = mlist; ml; ml = ml->next){
+        if (ml->size == chunk->size){
+            ml->put(chunk);
+            break;
         }
     }
-    void *addr = malloc(sz + EXTRASPACE);
-    auto mb = static_cast<mem_block*>(addr);
-    mb->size = sz;
-    mtx.unlock();
-    return mb->end;
 }
 
-int mem_pool::dealloc(void *addr){
-    auto block = reinterpret_cast<mem_block*>(static_cast<char*>(addr) - sizeof(struct mem_block));
-    block->prev = nullptr;
-    mtx.lock();
-    block->next = head_; 
-    if (head_){
-        head_->prev = block;
-    }
-    head_ = block;
-    mtx.unlock();
-    return 0;
-}
+
 
 } // namespace verihy
+
